@@ -4,7 +4,8 @@
   "description": "TypeScript ORM for MySQL",
   "main": "lib/index.js",
   "scripts": {
-    "test": "jest"
+    "test": "jest",
+    "coverage": "jest --coverage"
   },
   "repository": {
     "type": "git",
