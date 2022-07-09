@@ -1,0 +1,43 @@
+{
+  "name": "@odyssoft/tssql",
+  "version": "1.0.0",
+  "description": "TypeScript ORM for MySQL",
+  "main": "lib/index.js",
+  "scripts": {
+    "test": "jest"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/odyssoft/tssql.git"
+  },
+  "keywords": [
+    "TypeScript",
+    "ORM",
+    "MySQL",
+    "Node.js",
+    "JavaScript",
+    "Database",
+    "Jest"
+  ],
+  "author": "Sean Hewitson",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/odyssoft/tssql/issues"
+  },
+  "homepage": "https://github.com/odyssoft/tssql#readme",
+  "dependencies": {
+    "mysql2": "^2.3.3"
+  },
+  "devDependencies": {
+    "@types/jest": "^28.1.4",
+    "dotenv": "^16.0.1",
+    "eslint": "^8.19.0",
+    "eslint-config-prettier": "^8.5.0",
+    "eslint-plugin-prettier": "^4.2.1",
+    "jest": "^28.1.2",
+    "prettier": "^2.7.1",
+    "ts-jest": "^28.0.5",
+    "ts-node": "^10.8.2",
+    "typescript": "^4.7.4"
+  }
+}
