@@ -1,32 +1,44 @@
 import { ModelKeys, ModelType } from './@types/model'
 
-function Model<T>(name: string, keys: ModelKeys<T>): ModelType<T> {
-  return {
-    delete: () => {},
-    find: () => {},
-  }
+function createModel<T>(name: string, keys: ModelKeys<T>) {
+  return Model<T>
 }
 
-type TestClass = {
+interface IUser {
   name: string
+  password: string
   age: number
-
-  testFunc: () => void
 }
 
-class Test {
-  name: string
-  age: number
-  constructor(name: string, age: number) {
-    this.name = name
-    this.age = age
+const User = createModel<IUser>('user', {
+  name: {
+    type: 'VARCHAR',
+    length: 255,
+    required: true,
+  },
+  password: {
+    type: 'VARCHAR',
+    length: 255,
+    required: true,
+  },
+  age: {
+    type: 'INT',
+    required: true,
+  },
+})
+
+const user = new User({ name: 'test', password: 'test', age: 1 })
+// user.
+
+class Model<T> implements ModelType<T> {
+  properties: Partial<T>
+  constructor(object: T) {
+    this.properties = object
   }
 
-  static testFunc() {}
-  static {
-    console.log('static called')
-  }
+  save() {}
 }
 
-const testModel = new Test('test', 1)
-const testModel2 = Test.testFunc()
+user
+
+export default Model
