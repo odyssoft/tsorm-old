@@ -1,6 +1,13 @@
 export type IModel<T> = (data: T) => ModelType<T> | ModelType<T>[]
+export interface ModelType<T> {
+  [key: string]: any
+  keys: ModelKeys<T>
+  name: string
+  model: ModelClass<T>
+}
+
 // export interface
-export interface AliasModelType<T> {
+export interface AliasModelClass<T> {
   [key: string]: any
   count?: (options?: any) => Promise<number>
   create?: (data: T) => Promise<any>
@@ -19,15 +26,15 @@ export interface AliasModelType<T> {
   findOneAndReplace?: (options: any, data: T) => Promise<T>
   findOneAndUpdate?: (options: any, data: T) => Promise<T>
   insertMany?: (data: T[]) => Promise<any>
-  keys: ModelKeys<T>
-  name: string
-  update?: (data: T | T[]) => Promise<T>
+  keys?: ModelKeys<T>
+  name?: string
+  update?: (data: T | T[], options: any) => Promise<T>
   updateMany?: (data: T[]) => Promise<T[]>
   updateOne?: (data: T) => Promise<T>
 }
 
-export interface ModelType<T> extends AliasModelType<T> {
-  as?: (alias: string) => AliasModelType<T>
+export interface ModelClass<T> extends AliasModelClass<T> {
+  as?: (alias: string) => AliasModelClass<T>
 }
 
 export type ModelKeys<T> = {
