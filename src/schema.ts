@@ -1,8 +1,5 @@
-import { ModelClass, ModelKeys, ModelType } from './@types/model'
+import { AliasModelType, ConnectionOptions, ModelKeys, ModelType, SchemaType } from './types'
 import { createPool } from 'mysql2/promise'
-
-import { ConnectionOptions, KeyOf, SchemaType } from './@types'
-import model from 'model'
 
 export function Schema<T>(name: string, options: ConnectionOptions): SchemaType<T> {
   const connection = createPool(options)
@@ -18,10 +15,9 @@ export function Schema<T>(name: string, options: ConnectionOptions): SchemaType<
     close() {
       connection.end()
     },
-    addModel<T>({ keys, model, name }: ModelType<T>) {
-      const key = name as KeyOf<T>
+    addModel<T>(model: ModelType<T>): ModelType<T> {
       //  @ts-ignore
-      this.models[key] = keys
+      this.models[model.name] = model.keys
       return model
     },
   }

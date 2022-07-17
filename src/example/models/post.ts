@@ -1,30 +1,30 @@
 import MySchema from 'example/schema'
 import createModel from 'model'
 
-export interface IUser {
+export interface IPost {
   id?: string
-  name: string
-  age: number
+  userId: string
+  post: string
 }
 
-const user = createModel<IUser>('user', {
+const post = createModel<IPost>('post', {
   id: {
     autoIncrement: true,
     primaryKey: true,
     required: true,
     type: 'INT',
   },
-  age: {
+  userId: {
     required: true,
     type: 'INT',
   },
-  name: {
+  post: {
     required: true,
     type: 'VARCHAR',
     length: 255,
   },
 })
 
-const User = MySchema.addModel<IUser>(user)
+const Post = MySchema.addModel<IPost>(post)
 
-export default User
+export default Post

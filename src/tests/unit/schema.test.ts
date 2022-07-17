@@ -1,5 +1,5 @@
 import { PoolOptions } from 'mysql2/promise'
-import { ConnectionOptions } from '../../@types'
+import { ConnectionOptions } from '../../types'
 import Schema from '../../schema'
 
 const mockEnd = jest.fn()
