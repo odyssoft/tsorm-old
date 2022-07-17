@@ -1,4 +1,6 @@
+import model from 'model'
 import { Pool, PoolOptions } from 'mysql2/promise'
+import { ModelKeys, ModelType } from './model'
 
 export interface ConnectionOptions extends PoolOptions {
   host: string
@@ -7,9 +9,15 @@ export interface ConnectionOptions extends PoolOptions {
   user: string
 }
 
+type Models<T> = {
+  [K in keyof T]?: ModelType<T[K]>
+}
+
 export type SchemaType<T> = {
   connection: Pool
+  models: Models<T>
   name: string
 
+  addModel: <T>(model: ModelType<T>) => ModelType<T>
   close: () => void
 }

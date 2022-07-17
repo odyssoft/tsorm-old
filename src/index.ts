@@ -1,2 +1,2 @@
-export * as Schema from './schema'
-export * as Model from './model'
+export * from './schema'
+export * from './model'

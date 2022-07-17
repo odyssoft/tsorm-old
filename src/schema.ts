@@ -1,8 +1,7 @@
+import { AliasModelType, ConnectionOptions, ModelKeys, ModelType, SchemaType } from './types'
 import { createPool } from 'mysql2/promise'
 
-import { ConnectionOptions, SchemaType } from './@types'
-
-function Schema<T>(name: string, options: ConnectionOptions): SchemaType<T> {
+export function Schema<T>(name: string, options: ConnectionOptions): SchemaType<T> {
   const connection = createPool(options)
   connection.query(`CREATE DATABASE IF NOT EXISTS ${name}; USE ${name}`).catch((error: any) => {
     console.error({ error: error.toString() })
@@ -12,8 +11,14 @@ function Schema<T>(name: string, options: ConnectionOptions): SchemaType<T> {
   return {
     connection,
     name,
+    models: {},
     close() {
       connection.end()
+    },
+    addModel<T>(model: ModelType<T>): ModelType<T> {
+      //  @ts-ignore
+      this.models[model.name] = model.keys
+      return model
     },
   }
 }
