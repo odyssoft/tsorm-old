@@ -3,11 +3,8 @@ import createModel from 'model'
 
 export interface IUser {
   id?: string
-  forename: string
-  surname: string
-  email: string
-  password: string
-  birthday: Date
+  name: string
+  age: number
 }
 
 const user = createModel<IUser>('user', {
@@ -17,35 +14,30 @@ const user = createModel<IUser>('user', {
     required: true,
     type: 'INT',
   },
-  forename: {
+  age: {
+    required: true,
+    type: 'INT',
+  },
+  name: {
+    required: true,
+    type: 'VARCHAR',
     length: 255,
-    required: true,
-    type: 'VARCHAR',
-  },
-  surname: {
-    length: 255,
-    required: true,
-    type: 'VARCHAR',
-  },
-  email: {
-    length: 320,
-    required: true,
-    type: 'VARCHAR',
-  },
-  password: {
-    length: 255,
-    required: true,
-    type: 'VARCHAR',
-  },
-  birthday: {
-    required: true,
-    type: 'DATE',
   },
 })
 
 const User = MySchema.addModel<IUser>(user)
 
-const test = new User({})
+declare class ModelClass<T> {
+  constructor(data: T)
+  id: string
+  data: T
+  save(): Promise<void>
+  delete(): Promise<void>
+}
+
+const test = new User({
+  ModelClass,
+})
 
 // const test = new User({
 //   forename: 'John',
