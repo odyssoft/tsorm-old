@@ -1,5 +1,7 @@
-import { KeyOf, OperatorType } from './'
+import { KeyOf, OperatorType, Or } from './'
 
-export type Where<T, S = any> = {
-  [Key in KeyOf<T>]?: KeyOf<S> | number | null | OperatorType<S> | OperatorType<S>[]
+type WhereOptions<T, S = any> = {
+  [Key in KeyOf<T>]?: number | null | OperatorType<S> | OperatorType<S>[]
 }
+
+export type Where<T, S = any> = Or<WhereOptions<T, S>> | WhereOptions<T, S>

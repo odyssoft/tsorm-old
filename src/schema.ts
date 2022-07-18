@@ -1,4 +1,4 @@
-import { AliasModelType, ConnectionOptions, ModelKeys, ModelType, SchemaType } from './types'
+import { ConnectionOptions, ModelType, SchemaType } from './types'
 import { createPool } from 'mysql2/promise'
 
 export function Schema<T>(name: string, options: ConnectionOptions): SchemaType<T> {
