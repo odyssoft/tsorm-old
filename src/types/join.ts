@@ -3,10 +3,16 @@ import { IPost } from 'example/models/post'
 import { IUser } from 'example/models/user'
 import { KeyOf, OperatorType, Or } from './'
 
-type WhereOptions<T> = {
+type JoinOptions<T> = {
   [Key in KeyOf<T>]?: number | null | OperatorType<T> | OperatorType<T>[]
 }
 
-export type Where<T, S = any> = Or<WhereOptions<T>> | WhereOptions<T>
+export type Join<T> = Or<JoinOptions<T>> | JoinOptions<T>
 
-const test: Where<IUser | IPost | IComment>
+type TestType<T> = {
+  [K in KeyOf<T>]?: KeyOf<T>
+}
+
+const test: TestType<IUser & IComment> = {
+  age: 
+}
