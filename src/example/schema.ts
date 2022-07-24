@@ -29,7 +29,9 @@ const Models: Models<IMySchema> = {
 
 */
 
-function CreateSchema<T>() {}
+function CreateSchema<T>() {
+  return {}
+}
 
 const MySchema = CreateSchema<IMySchema>()
 

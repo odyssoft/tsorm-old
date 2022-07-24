@@ -1,61 +1,37 @@
-import { AliasModelType, ModelKeys, ModelType } from './types'
+import { IUser } from 'example/models/user'
+import { AliasModelType, ModelKeys, ModelType, Where } from './types'
 
 function model<T>(name: string, keys: ModelKeys<T>): ModelType<T> {
   return {
     name,
     keys,
-    as(alias: string): AliasModelType<T> {
-      return <AliasModelType<T>>(<any>this)
+    as<A extends string>(alias: string): AliasModelType<T, A> {
+      return <AliasModelType<T, A>>(<any>this)
     },
-    count(options?: any): Promise<number> {
-      return Promise.resolve(0)
-    },
-    create(data: T): Promise<T> {
-      return Promise.resolve({} as T)
-    },
-    createMany(data: T[]): Promise<T[]> {
-      return Promise.resolve([] as T[])
-    },
-    deleteMany(options?: any): Promise<boolean> {
-      return Promise.resolve(true)
-    },
-    deleteOne(options: any): Promise<boolean> {
-      return Promise.resolve(true)
-    },
-    distinct(options: any): Promise<T[]> {
-      return Promise.resolve([] as T[])
-    },
-    exists(options: any): Promise<boolean> {
-      return Promise.resolve(true)
-    },
-    find(options?: any): Promise<T[]> {
-      return Promise.resolve([] as T[])
-    },
-    findById(id: number): Promise<T> {
-      return Promise.resolve({} as T)
-    },
-    findByIdAndDelete(id: number): Promise<boolean> {
-      return Promise.resolve(true)
-    },
-    findByIdAndRemove(id: number): Promise<boolean> {
-      return Promise.resolve(true)
-    },
-    findByIdAndUpdate(id: number, data: T): Promise<T> {
-      return Promise.resolve({} as T)
-    },
-    findOne(options: any): Promise<T> {
-      return Promise.resolve({} as T)
-    },
-    findOneAndDelete(options: any): Promise<boolean> {
-      return Promise.resolve(true)
-    },
-    findOneAndRemove(options: any): Promise<boolean> {
-      return Promise.resolve(true)
-    },
-    findOneAndUpdate(options: any): Promise<T> {
-      return Promise.resolve({} as T)
-    },
+    delete(options: Where<T>) {},
+    insert(data: T | T[]) {},
+    select() {},
+    update(data: T | T[]) {},
   }
 }
 
 export default model
+
+const user = model<IUser>('user', {
+  userId: {
+    type: 'INT',
+    primaryKey: true,
+    autoIncrement: true,
+  },
+  age: {
+    type: 'INT',
+  },
+  name: {
+    type: 'VARCHAR',
+    length: 255,
+  },
+})
+
+const alias = user.as<'u'>('u')
+alias.keys['u.age']
+alias.
