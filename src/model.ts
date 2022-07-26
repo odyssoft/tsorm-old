@@ -1,4 +1,3 @@
-import { IUser } from 'example/models/user'
 import { AliasModelType, ModelKeys, ModelType, Where } from './types'
 
 function model<T>(name: string, keys: ModelKeys<T>): ModelType<T> {
@@ -16,22 +15,3 @@ function model<T>(name: string, keys: ModelKeys<T>): ModelType<T> {
 }
 
 export default model
-
-const user = model<IUser>('user', {
-  userId: {
-    type: 'INT',
-    primaryKey: true,
-    autoIncrement: true,
-  },
-  age: {
-    type: 'INT',
-  },
-  name: {
-    type: 'VARCHAR',
-    length: 255,
-  },
-})
-
-const alias = user.as<'u'>('u')
-alias.keys['u.age']
-alias.
