@@ -7,6 +7,6 @@ type WhereOptions<T> = {
   [Key in KeyOf<T>]?: number | null | OperatorType<T> | OperatorType<T>[]
 }
 
-export type Where<T> = Or<WhereOptions<T>> | WhereOptions<T>
+export type Where<T, A = any> = Or<WhereOptions<T>> | WhereOptions<T>
 
 const test: Where<IUser & IPost & IComment> = {}

@@ -14,7 +14,7 @@ export interface BaseModelType<T> {
   delete: (options: Where<T>) => void
   insert: (data: T | T[]) => void
   update: (data: T | T[]) => void
-  select: () => void
+  select: <S = any>(options: Where<T, S>) => void
 }
 
 export type ModelKeys<T> = {
