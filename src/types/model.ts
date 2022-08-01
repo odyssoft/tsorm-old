@@ -4,7 +4,7 @@ export type AliasModelKeys<T, A extends string> = {
   [K in keyof T as K extends string ? `${A}.${K}` : never]: T[K]
 }
 
-export interface AliasModelType<T, A extends string> extends BaseModelType<T> {
+export interface AliasModelType<T, A extends string> extends BaseModelType<AliasModelKeys<T, A>> {
   keys: AliasModelKeys<T, A>
 }
 
