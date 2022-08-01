@@ -1,6 +1,11 @@
+export * from './delete'
+export * from './insert'
+export * from './join'
 export * from './model'
 export * from './operator'
 export * from './schema'
+export * from './select'
+export * from './update'
 export * from './where'
 
 export interface ColumnOptions {

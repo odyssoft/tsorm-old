@@ -5,7 +5,3 @@ type JoinOptions<T> = {
 }
 
 export type Join<T> = Or<JoinOptions<T>> | JoinOptions<T>
-
-type TestType<T> = {
-  [K in KeyOf<T>]?: KeyOf<T>
-}

@@ -1,4 +1,4 @@
-import { ColumnOptions, Indexable, KeyOf, Where } from './'
+import { ColumnOptions, Delete, Indexable, Insert, KeyOf, Select, Update } from './'
 
 export type AliasModelKeys<T, A extends string> = {
   [K in keyof T as K extends string ? `${A}.${K}` : never]: T[K]
@@ -11,10 +11,10 @@ export interface AliasModelType<T, A extends string> extends BaseModelType<T> {
 export interface BaseModelType<T> {
   [key: string]: any
   name: string
-  delete: (options: Where<T>) => void
-  insert: (data: T | T[]) => void
-  update: (data: T | T[]) => void
-  select: <S = any>(options: Where<T, S>) => void
+  delete: Delete<T>
+  insert: Insert<T>
+  select: Select<T>
+  update: Update<T>
 }
 
 export type ModelKeys<T> = {
