@@ -1,4 +1,4 @@
-import Post from 'example/models/post'
+import Post, { IPost } from 'example/models/post'
 import User from 'example/models/user'
 import { ColumnOptions, Delete, Indexable, Insert, Join, KeyOf, Select, Update } from './'
 
@@ -8,7 +8,7 @@ export type AliasModelKeys<T, A extends string> = {
 
 export interface AliasModelType<T, A extends string> extends BaseModelType<AliasModelKeys<T, A>> {
   keys: AliasModelKeys<T, A>
-  join: Join<T, A>
+  join: Join<T>
 }
 
 export interface BaseModelType<T> {
@@ -20,6 +20,12 @@ export interface BaseModelType<T> {
   update: Update<T>
 }
 
+export interface JoinModelType<T, A extends string> extends BaseModelType<AliasModelKeys<T, A>> {
+  keys: ModelKeys<AliasModelKeys<T, A>>
+  join: Join<AliasModelKeys<T, A>>
+  toModel: () => ModelType<T>
+}
+
 export type ModelKeys<T> = {
   [key in KeyOf<T>]: ColumnOptions
 } & Indexable
@@ -29,4 +35,4 @@ export interface ModelType<T> extends BaseModelType<T> {
   as<A extends string>(alias: string): AliasModelType<T, A>
 }
 
-User.as<'u'>('u').join(Post.as<'p'>('p'), {})
+User.as<'u'>('u').to
