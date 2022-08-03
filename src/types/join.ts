@@ -1,10 +1,13 @@
-import { KeyOf, OperatorType, Or } from './'
+import { AliasModelType, BaseModelType, KeyOf, OperatorType, Or } from './'
 
 type JoinOptions<T> = {
   [Key in KeyOf<T>]?: number | null | OperatorType<T> | OperatorType<T>[]
 }
 
-// export type J
+export type Join<T, A extends string> = <S>(
+  model: AliasModelType<T, A>,
+  joinOptions: JoinOptions<T & S>
+) => BaseModelType<T & S>
 
 // export type Join<T, S = any> =
 

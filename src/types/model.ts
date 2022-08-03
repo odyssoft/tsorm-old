@@ -1,4 +1,6 @@
-import { ColumnOptions, Delete, Indexable, Insert, KeyOf, Select, Update } from './'
+import Post from 'example/models/post'
+import User from 'example/models/user'
+import { ColumnOptions, Delete, Indexable, Insert, Join, KeyOf, Select, Update } from './'
 
 export type AliasModelKeys<T, A extends string> = {
   [K in keyof T as K extends string ? `${A}.${K}` : never]: T[K]
@@ -6,6 +8,7 @@ export type AliasModelKeys<T, A extends string> = {
 
 export interface AliasModelType<T, A extends string> extends BaseModelType<AliasModelKeys<T, A>> {
   keys: AliasModelKeys<T, A>
+  join: Join<T, A>
 }
 
 export interface BaseModelType<T> {
@@ -25,3 +28,5 @@ export interface ModelType<T> extends BaseModelType<T> {
   keys: ModelKeys<T>
   as<A extends string>(alias: string): AliasModelType<T, A>
 }
+
+User.as<'u'>('u').join(Post.as<'p'>('p'), {})
