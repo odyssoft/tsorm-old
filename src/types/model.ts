@@ -12,7 +12,7 @@ export interface AliasModelType<T, A extends string> extends BaseModelType<Alias
   join: <S, AA extends string>(
     model: AliasModelType<S, AA>,
     options: JoinOptions<AliasModelKeys<T, A> & AliasModelKeys<S, AA>>
-  ) => ModelType<AliasModelKeys<T, A> & AliasModelKeys<S, AA>>
+  ) => JoinModelType<AliasModelKeys<T, A> & AliasModelKeys<S, AA>>
 }
 
 export interface BaseModelType<T> {
@@ -21,8 +21,15 @@ export interface BaseModelType<T> {
   name: string
   // delete: Delete<T>
   // insert: Insert<T>
-  // select: Select<T>
+  select: Select<T>
   // update: Update<T>
+}
+
+export interface JoinModelType<T> extends BaseModelType<T> {
+  join: <S, A extends string>(
+    model: AliasModelType<S, A>,
+    options: JoinOptions<T & AliasModelKeys<S, A>>
+  ) => JoinModelType<T & AliasModelKeys<S, A>>
 }
 
 export type ModelKeys<T> = {
@@ -34,21 +41,11 @@ export interface ModelType<T> extends BaseModelType<T> {
   as<A extends string>(alias: string): AliasModelType<T, A>
 }
 
-User.as<'u'>('u').join<IPost, 'p'>(Post.as<'p'>('p'), {
-  'u.userId': 'p.postId',
-})
-
-// User.as<'u'>('u').join<IPost, 'p'>(Post.as<'p'>('p'), {
-//   'u.userId': 'p.postId',
-// })
-//  Rework aliasmodel type as ModelType<AliasModelKeys<T, A>>
-
-// const test = Comment.as<'c'>('c').join<IPost, 'p'>(Post.as<'p'>('p'), {
-//   'c.postId': 'p.postId',
-// })
-
-// User.as<'u'>('u').join<IComment, 'c'>(Comment.as<'c'>('c'), {})
-
-// const testAlias: KeyOf<AliasModelKeys<IPost, 'p'> & AliasModelKeys<IComment, 'c'>>
-
-// const aliasKeys: KeyOf<AliasModelKeys<IPost, 'p'> & AliasModelKeys<IComment, 'c'>>
+User.as<'u'>('u')
+  .join<IPost, 'p'>(Post.as<'p'>('p'), {
+    'u.userId': 'p.postId',
+  })
+  .join<IComment, 'c'>(Comment.as<'c'>('c'), {
+    'p.postId': 'c.postId',
+  })
+  .select({})

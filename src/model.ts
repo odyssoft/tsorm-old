@@ -4,6 +4,7 @@ import {
   JoinOptions,
   ModelKeys,
   ModelType,
+  SelectOptions,
   UpdateOptions,
   Where,
 } from './types'
@@ -29,6 +30,8 @@ export function model<T>(name: string, keys: ModelKeys<T>): ModelType<T> {
         },
       })
     },
+
+    select(options: Where<T>) {},
   }
 }
 
