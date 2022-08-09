@@ -21,7 +21,7 @@ export interface BaseModelType<T> {
   name: string
   // delete: Delete<T>
   // insert: Insert<T>
-  select: Select<T>
+  // select: Select<T>
   // update: Update<T>
 }
 
@@ -36,12 +36,16 @@ export interface ModelType<T> extends BaseModelType<T> {
 
 User.as<'u'>('u').join<IPost, 'p'>(Post.as<'p'>('p'), {
   'u.userId': 'p.postId',
-}).
+})
+
+// User.as<'u'>('u').join<IPost, 'p'>(Post.as<'p'>('p'), {
+//   'u.userId': 'p.postId',
+// })
 //  Rework aliasmodel type as ModelType<AliasModelKeys<T, A>>
 
-const test = Comment.as<'c'>('c').join<IPost, 'p'>(Post.as<'p'>('p'), {
-  'c.postId': 'p.postId',
-})
+// const test = Comment.as<'c'>('c').join<IPost, 'p'>(Post.as<'p'>('p'), {
+//   'c.postId': 'p.postId',
+// })
 
 // User.as<'u'>('u').join<IComment, 'c'>(Comment.as<'c'>('c'), {})
 
