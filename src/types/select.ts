@@ -1,7 +1,10 @@
-import { Where } from './'
+import { KeyOf, Where } from './'
 
 export interface SelectOptions<T> {
-  // $join?: Join<T>
-  // $where?: Where<T>
+  $columns?: Column<T>[]
+  $where?: Where<T>
 }
-export type Select<T> = (options: Where<T>) => void
+
+type Column<T> = KeyOf<T>
+
+export type Select<T> = (options?: SelectOptions<T>) => void
