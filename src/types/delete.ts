@@ -1,5 +1,5 @@
-import { Where } from './'
+import { AliasModelKeys, Where } from './'
 
-export type DeleteOptions<T, A = any> = Where<T, A>
+export type DeleteOptions<T, A = any> = Where<A extends string ? AliasModelKeys<T, A> : T>
 
-export type Delete<T> = (options?: DeleteOptions<T>) => void
+export type Delete<T> = (options: DeleteOptions<T>) => void

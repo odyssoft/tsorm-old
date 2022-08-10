@@ -32,10 +32,10 @@ export function model<T>(name: string, keys: ModelKeys<T>): ModelType<T> {
       })
     },
 
-    delete(options?: DeleteOptions<T>) {},
+    delete(options: DeleteOptions<T>) {},
     insert(data: T | T[]) {},
     select(options?: SelectOptions<T>) {},
-    update(data: T | T[], options?: UpdateOptions<T>) {},
+    update(data: T | T[], options: UpdateOptions<T>) {},
   }
 }
 
