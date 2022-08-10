@@ -2,13 +2,13 @@ import MySchema from 'example/schema'
 import createModel from 'model'
 
 export interface IPost {
-  id?: string
+  postId?: string
   userId: string
   post: string
 }
 
 const post = createModel<IPost>('post', {
-  id: {
+  postId: {
     autoIncrement: true,
     primaryKey: true,
     required: true,

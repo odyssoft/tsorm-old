@@ -193,6 +193,10 @@ interface NotLike {
   $notLike: LikeType
 }
 
+export type Or<T> = {
+  $or: [T, T, ...T[]]
+}
+
 export type OperatorType<T> =
   | KeyOf<T>
   | Between<T>

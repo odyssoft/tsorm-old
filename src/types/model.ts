@@ -1,73 +1,35 @@
-import { Where } from './'
+import { ColumnOptions, Delete, Indexable, Insert, JoinOptions, KeyOf, Select, Update } from './'
 
-export interface AliasModelType<T> {
-  keys: ModelKeys<T>
-  name: string
-  count(options?: any): Promise<number>
-  create(data: T): Promise<T>
-  createMany(data: T[]): Promise<T[]>
-  deleteMany(options?: Where<T>): Promise<boolean>
-  deleteOne(options: Where<T>): Promise<boolean>
-  distinct(options: any): Promise<T[]>
-  exists(options: Where<T>): Promise<boolean>
-  find(options?: any): Promise<T[]>
-  findById(id: number): Promise<T>
-  findByIdAndDelete(id: number): Promise<boolean>
-  findByIdAndRemove(id: number): Promise<boolean>
-  findByIdAndUpdate(id: number, data: T): Promise<T>
-  findOne(options: any): Promise<T>
-  findOneAndDelete(options: Where<T>): Promise<boolean>
-  findOneAndRemove(options: Where<T>): Promise<boolean>
-  findOneAndUpdate(options: Where<T>, data: T): Promise<T>
+export type AliasModelKeys<T, A extends string> = {
+  [K in keyof T as K extends string ? `${A}.${K}` : never]: T[K]
 }
 
-export interface ModelType<T> extends AliasModelType<T> {
-  as(alias: string): AliasModelType<T>
+export interface AliasModelType<T, A extends string> extends JoinModelType<AliasModelKeys<T, A>> {
+  keys: ModelKeys<AliasModelKeys<T, A>>
+}
+
+export interface BaseModelType<T> {
+  [key: string]: any
+  keys: ModelKeys<T>
+  name: string
+  delete: Delete<T>
+  insert: Insert<T>
+  select: Select<T>
+  update: Update<T>
+}
+
+export interface JoinModelType<T> extends BaseModelType<T> {
+  join: <S, A extends string>(
+    model: AliasModelType<S, A>,
+    options: JoinOptions<T & AliasModelKeys<S, A>>
+  ) => JoinModelType<T & AliasModelKeys<S, A>>
 }
 
 export type ModelKeys<T> = {
-  [key in keyof T]: ColumnOptions
-}
+  [key in KeyOf<T>]: ColumnOptions
+} & Indexable
 
-export interface ColumnOptions {
-  autoIncrement?: boolean
-  default?: any
-  length?: number
-  primaryKey?: boolean
-  required?: boolean
-  type:
-    | 'CHAR'
-    | 'VARCHAR'
-    | 'BINARY'
-    | 'VARBINARY'
-    | 'TINYBLOB'
-    | 'TINYTEXT'
-    | 'TEXT'
-    | 'BLOB'
-    | 'MEDIUMTEXT'
-    | 'MEDIUMBLOB'
-    | 'LONGTEXT'
-    | 'LONGBLOB'
-    | 'ENUM'
-    | 'SET'
-    | 'BIT'
-    | 'TINYINT'
-    | 'BOOL'
-    | 'BOOLEAN'
-    | 'SMALLINT'
-    | 'MEDIUMINT'
-    | 'INT'
-    | 'INTEGER'
-    | 'BIGINT'
-    | 'FLOAT'
-    | 'FLOAT'
-    | 'DOUBLE'
-    | 'DOUBLE PRECISION'
-    | 'DECIMAL'
-    | 'DEC'
-    | 'DATE'
-    | 'DATETIME'
-    | 'TIMESTAMP'
-    | 'TIME'
-    | 'YEAR'
+export interface ModelType<T> extends BaseModelType<T> {
+  keys: ModelKeys<T>
+  as<A extends string>(alias: string): AliasModelType<T, A>
 }

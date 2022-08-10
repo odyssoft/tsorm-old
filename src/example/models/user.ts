@@ -2,13 +2,13 @@ import MySchema from 'example/schema'
 import createModel from 'model'
 
 export interface IUser {
-  id?: string
+  userId?: string
   name: string
   age: number
 }
 
 const user = createModel<IUser>('user', {
-  id: {
+  userId: {
     autoIncrement: true,
     primaryKey: true,
     required: true,

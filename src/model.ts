@@ -1,61 +1,51 @@
-import { AliasModelType, ModelKeys, ModelType } from './types'
+import {
+  AliasModelKeys,
+  AliasModelType,
+  DeleteOptions,
+  JoinOptions,
+  ModelKeys,
+  ModelType,
+  SelectOptions,
+  UpdateOptions,
+  Where,
+} from './types'
 
-function model<T>(name: string, keys: ModelKeys<T>): ModelType<T> {
+export function model<T>(name: string, keys: ModelKeys<T>): ModelType<T> {
   return {
-    name,
+    joins: [],
     keys,
-    as(alias: string): AliasModelType<T> {
-      return <AliasModelType<T>>(<any>this)
+    name,
+
+    as<A extends string>(alias: string): AliasModelType<T, A> {
+      return <AliasModelType<T, A>>(<any>{
+        ...this,
+        join<S, AA extends string>(
+          model: AliasModelType<S, AA>,
+          options: JoinOptions<AliasModelKeys<T, A> & AliasModelKeys<S, AA>>
+        ) {
+          return join<AliasModelType<T, A>, AliasModelKeys<T, A>, S, AA>(
+            <ModelType<AliasModelType<T, A>>>(<any>this),
+            model,
+            options
+          )
+        },
+      })
     },
-    count(options?: any): Promise<number> {
-      return Promise.resolve(0)
-    },
-    create(data: T): Promise<T> {
-      return Promise.resolve({} as T)
-    },
-    createMany(data: T[]): Promise<T[]> {
-      return Promise.resolve([] as T[])
-    },
-    deleteMany(options?: any): Promise<boolean> {
-      return Promise.resolve(true)
-    },
-    deleteOne(options: any): Promise<boolean> {
-      return Promise.resolve(true)
-    },
-    distinct(options: any): Promise<T[]> {
-      return Promise.resolve([] as T[])
-    },
-    exists(options: any): Promise<boolean> {
-      return Promise.resolve(true)
-    },
-    find(options?: any): Promise<T[]> {
-      return Promise.resolve([] as T[])
-    },
-    findById(id: number): Promise<T> {
-      return Promise.resolve({} as T)
-    },
-    findByIdAndDelete(id: number): Promise<boolean> {
-      return Promise.resolve(true)
-    },
-    findByIdAndRemove(id: number): Promise<boolean> {
-      return Promise.resolve(true)
-    },
-    findByIdAndUpdate(id: number, data: T): Promise<T> {
-      return Promise.resolve({} as T)
-    },
-    findOne(options: any): Promise<T> {
-      return Promise.resolve({} as T)
-    },
-    findOneAndDelete(options: any): Promise<boolean> {
-      return Promise.resolve(true)
-    },
-    findOneAndRemove(options: any): Promise<boolean> {
-      return Promise.resolve(true)
-    },
-    findOneAndUpdate(options: any): Promise<T> {
-      return Promise.resolve({} as T)
-    },
+
+    delete(options?: DeleteOptions<T>) {},
+    insert(data: T | T[]) {},
+    select(options?: SelectOptions<T>) {},
+    update(data: T | T[], options?: UpdateOptions<T>) {},
   }
+}
+
+function join<T, K, S, A extends string>(
+  original: ModelType<T>,
+  model: AliasModelType<S, A>,
+  options: JoinOptions<K & AliasModelKeys<S, A>>
+): ModelType<K & AliasModelKeys<S, A>> {
+  original.joins.push({ model, options })
+  return <ModelType<K & AliasModelKeys<S, A>>>(<any>original)
 }
 
 export default model

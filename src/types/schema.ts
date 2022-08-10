@@ -1,6 +1,5 @@
-import model from 'model'
 import { Pool, PoolOptions } from 'mysql2/promise'
-import { ModelKeys, ModelType } from './model'
+import { ModelType } from './model'
 
 export interface ConnectionOptions extends PoolOptions {
   host: string
