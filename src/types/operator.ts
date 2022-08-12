@@ -1,16 +1,16 @@
 import { KeyOf } from './'
 
-type BetweenType<T = any> = {
+export type BetweenType<T = any> = {
   min: KeyOf<T> | number
   max: KeyOf<T> | number
 }
-type EqualsType<T = any> = KeyOf<T> | number
-type GreaterThanType<T = any> = KeyOf<T> | number
-type GreaterThanEqualType<T = any> = KeyOf<T> | number
-type InType = (string | number)[]
-type LessThanType<T = any> = KeyOf<T> | number
-type LessThanEqualType<T = any> = KeyOf<T> | number
-type LikeType = string
+export type EqualsType<T = any> = KeyOf<T> | number
+export type GreaterThanType<T = any> = KeyOf<T> | number
+export type GreaterThanEqualType<T = any> = KeyOf<T> | number
+export type InType = (string | number)[]
+export type LessThanType<T = any> = KeyOf<T> | number
+export type LessThanEqualType<T = any> = KeyOf<T> | number
+export type LikeType = string
 
 interface Between<T> {
   [key: string]: any

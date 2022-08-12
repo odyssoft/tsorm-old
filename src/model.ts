@@ -1,3 +1,4 @@
+import { builder } from './builder'
 import {
   AliasModelKeys,
   AliasModelType,
@@ -15,7 +16,6 @@ export function model<T>(name: string, keys: ModelKeys<T>): ModelType<T> {
     joins: [],
     keys,
     name,
-
     as<A extends string>(alias: string): AliasModelType<T, A> {
       return <AliasModelType<T, A>>(<any>{
         ...this,
@@ -32,7 +32,9 @@ export function model<T>(name: string, keys: ModelKeys<T>): ModelType<T> {
       })
     },
 
-    delete(options: DeleteOptions<T>) {},
+    delete(options: DeleteOptions<T>) {
+      return builder<T>(this).delete(options)
+    },
     insert(data: T | T[]) {},
     select(options?: SelectOptions<T>) {},
     update(data: T | T[], options: UpdateOptions<T>) {},
