@@ -36,7 +36,9 @@ export function model<T>(name: string, keys: ModelKeys<T>): ModelType<T> {
       return builder<T>(this).delete(options)
     },
     insert(data: T | T[]) {},
-    select(options?: SelectOptions<T>) {},
+    select(options?: SelectOptions<T>) {
+      return builder<T>(this).select(options)
+    },
     update(data: T | T[], options: UpdateOptions<T>) {},
   }
 }

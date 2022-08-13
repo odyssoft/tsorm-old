@@ -1,5 +1,5 @@
-import MySchema from 'example/schema'
-import createModel from 'model'
+import MySchema from '../schema'
+import createModel from '../../model'
 
 export interface IPost {
   postId?: string

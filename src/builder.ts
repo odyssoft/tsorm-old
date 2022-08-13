@@ -25,10 +25,10 @@ export function builder<T>(model: ModelType<T>): Builder<T> {
       return `INSERT INTO ${model.name}`
     },
     select: (options?: SelectOptions<T>) => {
-      return `SELECT * FROM ${model.name}`
+      return `SELECT * FROM ${model.name} ${options && parseWhere(options.$where, model.keys)}`
     },
     update: (data: T | T[], options: UpdateOptions<T>) => {
-      return `UPDATE ${model.name}`
+      return `UPDATE ${model.name} ${parseWhere(options as Where<T>, model.keys)}`
     },
   }
 }
