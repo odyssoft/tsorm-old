@@ -17,6 +17,7 @@ export function model<T>(name: string, keys: ModelKeys<T>): ModelType<T> {
     keys,
     name,
     as<A extends string>(alias: string): AliasModelType<T, A> {
+      this.alias = alias
       return <AliasModelType<T, A>>(<any>{
         ...this,
         join<S, AA extends string>(

@@ -34,11 +34,8 @@ export const formatValue = <T>(
   if (typeof input === 'number') {
     return input
   }
-  if (input === true) {
-    return 1
-  }
-  if (input === false) {
-    return 0
+  if (input === true || input === false) {
+    return input ? 1 : 0
   }
   let output = `'${input}'`
   if (keys) {
