@@ -1,4 +1,4 @@
-import operator from './operator'
+import operator, { formatValue } from './operator'
 import {
   DeleteOptions,
   InsertOptions,
@@ -12,70 +12,73 @@ import {
 
 type Builder<T> = {
   [key: string]: any
-  delete: (options: DeleteOptions<T>) => string
+  delete: (options: Where<T>) => string
   insert: (data: T | T[]) => string
   select: (options?: SelectOptions<T>) => string
+  truncate?: () => string
   update: (data: T | T[], options: UpdateOptions<T>) => string
+  upsert?: (data: T | T[]) => string
 }
 
 export function builder<T>({ alias, connection, joins, keys, name }: ModelType<T>): Builder<T> {
-  const table = `\`${name}\` ${alias ? `AS ${alias}` : ''}`
+  const table = `\`${name}\`${alias ? ` AS ${alias}` : ''}`
   return {
-    delete(options: DeleteOptions<T>): string {
+    delete(options: Where<T>): string {
       return `DELETE FROM ${table} WHERE ${parseOptions(options, keys)}`
     },
+
     insert(data: T | T[]): string {
-      const sql: string[] = [`INSERT INTO ${table}`]
-      return sql.join(' ')
+      return `INSERT INTO ${table} ${parseInsert(data)}`
     },
+
     select(options?: SelectOptions<T> | undefined): string {
-      const sql: string[] = [`SELECT * FROM ${table}`]
+      const sql: string[] = [
+        `SELECT ${options?.$columns ? options.$columns.join(', ') : '*'} FROM ${table}`,
+      ]
+
+      joins.forEach(({ model, joinOptions }: any) =>
+        sql.push(
+          `INNER JOIN \`${model.name}\` AS ${model.alias} ON ${parseOptions(
+            joinOptions,
+            model.keys
+          )}`
+        )
+      )
+
+      options?.$where && sql.push(`WHERE ${parseOptions(options.$where, keys)}`)
+
       return sql.join(' ')
     },
+
     update(data: T | T[], options: UpdateOptions<T>): string {
       const sql: string[] = [`UPDATE ${table} SET`]
-      const parseData = () => {
-        updates: 
-      }
+      const parseData = () => {}
       return sql.join(' ')
     },
   }
 }
 
-export function _builder<T>(model: ModelType<T>): Builder<T> {
-  return {
-    delete: (options: DeleteOptions<T>) =>
-      `DELETE FROM ${model.name} ${parseWhere(options as Where<T>, model.keys)}`,
-    insert: (data: T | T[]) => {
-      const sql: string[] = [`INSERT INTO ${model.name} VALUES`]
-      const values: string[] = []
-      Array.isArray(data) ? data.forEach((item) => {}) : Object
-      return `INSERT INTO \`${model.name}\``
-    },
-    select: (options?: SelectOptions<T>) => {
-      return `SELECT ${options?.$columns ?? '*'} FROM ${model.name} ${
-        model.joins.length > 0 && parseJoins(model.joins, model.keys)
-      } ${options?.$where && parseWhere(options.$where, model.keys)}`
-    },
-    update: (data: T | T[], options: UpdateOptions<T>) => {
-      return `UPDATE ${model.name} ${parseWhere(options as Where<T>, model.keys)}`
-    },
-  }
-}
-
-export const getKeysFromData = <T>(data: T | T[]): string[] => {
+export const parseInsert = <T>(data: T | T[]) => {
   const keys: string[] = []
   Array.isArray(data)
-    ? data.forEach((item) => {
-        Object.keys(item).forEach((key) => {
+    ? data.forEach((d) => {
+        Object.keys(d).forEach((key) => {
           if (!keys.includes(key)) {
             keys.push(key)
           }
         })
       })
-    : Object.keys(data).forEach((key) => keys.push(key))
+    : keys.push(...Object.keys(data))
 
-  return keys
+  const sql: string[] = [`(${keys.map((k) => `${k}`).join(', ')}) VALUES`]
+  const rows: any | any[] = []
+  Array.isArray(rows)
+    ? rows.forEach((row) => {
+        sql.push(`(${keys.map((k) => `${formatValue(row[k])}`).join(', ')})`)
+      })
+    : sql.push(`(${keys.map((k) => `${formatValue(rows[k])}`).join(', ')})`)
+
+  return `(${keys.join(', ')}) VALUES (${keys.map((key) => formatValue(key)).join(', ')})`
 }
 
 export const parseOptions = <T>(options: any, keys?: ModelKeys<T>): string =>
@@ -96,7 +99,7 @@ export const parseValue = <T>(key: string, value: any, keys?: ModelKeys<T>): str
     return `${key} IS NULL`
   }
   if (typeof value !== 'object') {
-    return `${key} = ${value}`
+    return `${key} = ${formatValue(value)}`
   }
   const Operator: any = operator(key, keys)
   const [id] = Object.keys(value)
