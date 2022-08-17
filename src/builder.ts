@@ -22,8 +22,7 @@ export function builder<T>({ alias, connection, joins, keys, name }: ModelType<T
   const table = `\`${name}\` ${alias ? `AS ${alias}` : ''}`
   return {
     delete(options: DeleteOptions<T>): string {
-      const sql: string[] = [`DELETE FROM ${table}`]
-      return sql.join(' ')
+      return `DELETE FROM ${table} WHERE ${parseOptions(options, keys)}`
     },
     insert(data: T | T[]): string {
       const sql: string[] = [`INSERT INTO ${table}`]
@@ -34,7 +33,10 @@ export function builder<T>({ alias, connection, joins, keys, name }: ModelType<T
       return sql.join(' ')
     },
     update(data: T | T[], options: UpdateOptions<T>): string {
-      const sql: string[] = [`UPDATE ${table}`]
+      const sql: string[] = [`UPDATE ${table} SET`]
+      const parseData = () => {
+        updates: 
+      }
       return sql.join(' ')
     },
   }
@@ -76,28 +78,8 @@ export const getKeysFromData = <T>(data: T | T[]): string[] => {
   return keys
 }
 
-export const parseJoins = <T>(joins: any[], keys?: ModelKeys<T>): string =>
-  joins
-    .map(
-      ({ model, options }) =>
-        `INNER JOIN \`${model.name}\` AS ${model.alias} ON ${Object.keys(options as any).map(
-          (key) => {
-            Array.isArray(options[key])
-              ? key === '$or'
-                ? `(${options[key]
-                    .map((i: number) => parseValue(key, options[key][i], keys))
-                    .join(' OR ')})`
-                : options[key]
-                    .map((i: number) => parseValue(key, options[key][i], keys))
-                    .join(' AND ')
-              : parseValue(key, options[key], keys)
-          }
-        )}`
-    )
-    .join(' ')
-
-export const parseWhere = <T>(options: any, keys?: ModelKeys<T>): string =>
-  `WHERE ${Object.keys(options as any)
+export const parseOptions = <T>(options: any, keys?: ModelKeys<T>): string =>
+  `${Object.keys(options as any)
     .map((key) =>
       Array.isArray(options[key])
         ? key === '$or'
