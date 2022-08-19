@@ -42,7 +42,7 @@ export function model<T>(name: string, keys: ModelKeys<T>): ModelType<T> {
     select(options?: SelectOptions<T>) {
       return builder<T>(this).select(options)
     },
-    update(data: T | T[], options: UpdateOptions<T>) {
+    update(data: Partial<T>, options: UpdateOptions<T>) {
       return builder<T>(this).update(data, options)
     },
   }
