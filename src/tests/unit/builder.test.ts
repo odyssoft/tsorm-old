@@ -1,6 +1,5 @@
-import { builder, parseInsert, parseOptions, parseValue } from '../../builder'
+import { builder, parseOptions, parseValue } from '../../builder'
 import model from '../../model'
-import { ModelKeys } from '../../types'
 
 type IMock = {
   id?: number
@@ -139,7 +138,26 @@ describe('builder', () => {
   describe('truncate', () => {
     it('should return correct truncate script', () => {
       const result = Builder.truncate()
-      expect(result).toBe('TRUNCATE `mock`')
+      expect(result).toBe('TRUNCATE TABLE `mock`')
+    })
+  })
+
+  describe('upsert', () => {
+    it('should return correct upsert script with single line', () => {
+      const result = Builder.upsert({ name: 'test', age: 5, isActive: true })
+      expect(result).toBe(
+        "INSERT INTO `mock` (name, age, isActive) VALUES ('test', 5, 1) ON DUPLICATE KEY UPDATE name = 'test', age = 5, isActive = 1"
+      )
+    })
+
+    it('should return correct upsert script with multiple lines', () => {
+      const result = Builder.upsert([
+        { name: 'test', age: 5 },
+        { name: 'test2', age: 6, isActive: false },
+      ])
+      expect(result).toBe(
+        "INSERT INTO `mock` (name, age, isActive) VALUES ('test', 5, NULL), ('test2', 6, 0) AS MANY ON DUPLICATE KEY UPDATE name = MANY.name, age = MANY.age, isActive = MANY.isActive"
+      )
     })
   })
 })

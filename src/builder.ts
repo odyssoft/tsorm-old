@@ -31,7 +31,8 @@ export function builder<T>({
     },
 
     insert(data: T | T[]): string {
-      return `INSERT INTO ${table} ${parseInsert(data)}`
+      const keys: string[] = getInsertKeys<T>(data)
+      return `INSERT INTO ${table} (${keys.join(', ')}) ${getInsertValues<T>(data, keys)}`
     },
 
     select(options?: SelectOptions<T> | undefined): string {
@@ -63,18 +64,28 @@ export function builder<T>({
     },
 
     upsert(data: T | T[]): string {
-      const sql: string[] = [`INSERT INTO ${table}`]
-      //  Get keys and values
+      const keys: string[] = getInsertKeys<T>(data)
+      const sql: string[] = [
+        `INSERT INTO ${table} (${keys.join(', ')}) ${getInsertValues<T>(data, keys)}`,
+      ]
 
-      sql.push(`ON DUPLUCATE KEY UPDATE`)
+      Array.isArray(data) && sql.push('AS MANY')
+      sql.push(`ON DUPLICATE KEY UPDATE`)
+      const rows: string[] = []
 
-      //  Iterate keys and values (remove identifier / first key in object / primary key?)
+      keys
+        .filter((key) => !rest.keys[key].primaryKey)
+        .forEach((key) =>
+          //  @ts-ignore
+          rows.push(`${key} = ${Array.isArray(data) ? `MANY.${key}` : formatValue(data[key])}`)
+        )
+      sql.push(rows.join(', '))
       return sql.join(' ')
     },
   }
 }
 
-export const parseInsert = <T>(data: T | T[]) => {
+export const getInsertKeys = <T>(data: T | T[]): string[] => {
   const keys: string[] = []
   Array.isArray(data)
     ? data.forEach((d) => {
@@ -86,7 +97,11 @@ export const parseInsert = <T>(data: T | T[]) => {
       })
     : keys.push(...Object.keys(data))
 
-  const sql: string[] = [`(${keys.map((k) => `${k}`).join(', ')}) VALUES`]
+  return keys
+}
+
+export const getInsertValues = <T>(data: T | T[], keys: string[]): string => {
+  const sql: string[] = ['VALUES']
   const rows: any | any[] = data
   if (Array.isArray(rows)) {
     const insert: string[] = []
