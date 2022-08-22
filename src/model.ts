@@ -1,3 +1,4 @@
+import { getInsertKeys, getInsertValues, parseOptions, parseValue } from './utils'
 import {
   AliasModelKeys,
   AliasModelType,
@@ -14,6 +15,19 @@ export function model<T>(name: string, keys: ModelKeys<T>): ModelType<T> {
     joins: [],
     keys,
     name,
+
+    getKeys(): string[] {
+      const keys: string[] = []
+      Object.keys(this.keys).forEach((key: string) =>
+        keys.push(`${this.alias ? `${this.alias}.` : ''}${key}`)
+      )
+      this.joins.forEach(({ model }: any) => {
+        Object.keys(model.keys).forEach((key: string) =>
+          keys.push(`${model.alias ? `${model.alias}.` : ''}${key}`)
+        )
+      })
+      return keys
+    },
 
     getTable(): string {
       return `\`${name}\`${this.alias ? ` AS ${this.alias}` : ''}`
@@ -37,7 +51,10 @@ export function model<T>(name: string, keys: ModelKeys<T>): ModelType<T> {
     },
 
     delete(options: Where<T>) {
-      const sql: string = `DELETE FROM ${this.getTable()} WHERE ${parseOptions(options, keys)}`
+      const sql: string = `DELETE FROM ${this.getTable()} WHERE ${parseOptions(
+        options,
+        this.getKeys()
+      )}`
       return this.connection?.query(sql)
     },
 
@@ -52,16 +69,19 @@ export function model<T>(name: string, keys: ModelKeys<T>): ModelType<T> {
 
     select(options?: SelectOptions<T>) {
       const sql: string[] = [
-        `SELECT ${options?.$columns ? options.$columns.join(', ') : '*'} FROM ${tablethis.getT`,()
+        `SELECT ${options?.$columns ? options.$columns.join(', ') : '*'} FROM ${this.getTable()}`,
       ]
 
-      joins.forEach(({ model, options: joinOptions }: any) => {
+      this.joins.forEach(({ model, options: joinOptions }: any) => {
         sql.push(
-          `INNER JOIN \`${model.name}\` AS ${model.alias} ON ${parseOptions(joinOptions, keys)}`
+          `INNER JOIN \`${model.name}\` AS ${model.alias} ON ${parseOptions(
+            joinOptions,
+            this.getKeys()
+          )}`
         )
       })
 
-      options?.$where && sql.push(`WHERE ${parseOptions(options.$where, keys)}`)
+      options?.$where && sql.push(`WHERE ${parseOptions(options.$where, this.getKeys())}`)
 
       return this.connection.query(sql.join(' '))
     },
@@ -72,16 +92,21 @@ export function model<T>(name: string, keys: ModelKeys<T>): ModelType<T> {
 
     update(data: Partial<T>, options: UpdateOptions<T>) {
       const sql: string[] = [`UPDATE ${this.getTable()} SET`]
-      const values = Object.keys(data).map((key) => parseValue(key, (data as any)[key], keys))
+      const values = Object.keys(data).map((key) =>
+        parseValue(key, (data as any)[key], this.getKeys())
+      )
       sql.push(values.join(', '))
-      sql.push(`WHERE ${parseOptions(options, keys)}`)
+      sql.push(`WHERE ${parseOptions(options, this.getKeys())}`)
       return this.connection.query(sql.join(' '))
     },
 
     upsert(data: Partial<T> | Partial<T>[], options: UpdateOptions<T>) {
       const keys: string[] = getInsertKeys<Partial<T>>(data)
       const sql: string[] = [
-        `INSERT INTO ${this.getTable()} (${keys.join(', ')}) ${getInsertValues<Partial<T>>(data, keys)}`,
+        `INSERT INTO ${this.getTable()} (${keys.join(', ')}) ${getInsertValues<Partial<T>>(
+          data,
+          keys
+        )}`,
       ]
 
       Array.isArray(data) && sql.push('AS MANY')
