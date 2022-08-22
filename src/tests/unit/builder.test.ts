@@ -1,4 +1,5 @@
-import { builder, parseOptions, parseValue } from '../../builder'
+import { OkPacket, FieldPacket } from 'mysql2'
+import { builder } from '../../builder'
 import model from '../../model'
 
 type IMock = {
@@ -51,41 +52,48 @@ const mockModel2 = model<IMock2>('mock2', {
   },
 })
 
+let mockPromise = Promise.resolve([{}])
+const mockQuery = jest.fn(() => mockPromise)
+
 describe('builder', () => {
-  const Builder = builder<IMock>(mockModel)
+  const Builder = builder<IMock>({
+    ...mockModel,
+    connection: {
+      query: mockQuery,
+    },
+  })
 
   describe('delete', () => {
     it('should return correct delete script as number', () => {
-      const result = Builder.delete({ age: 5 })
-
-      expect(result).toBe('DELETE FROM `mock` WHERE age = 5')
+      Builder.delete({ age: 5 })
+      expect(mockQuery).toHaveBeenCalledWith('DELETE FROM `mock` WHERE age = 5')
     })
 
     it('should return correct delete script as string', () => {
-      const result = Builder.delete({ name: 'test' })
-
-      expect(result).toBe("DELETE FROM `mock` WHERE name = 'test'")
+      Builder.delete({ name: 'test' })
+      expect(mockQuery).toHaveBeenCalledWith("DELETE FROM `mock` WHERE name = 'test'")
     })
 
     it('should return correct delete script as tinyint', () => {
-      const result = Builder.delete({ isActive: false })
-
-      expect(result).toBe('DELETE FROM `mock` WHERE isActive = 0')
+      Builder.delete({ isActive: false })
+      expect(mockQuery).toHaveBeenCalledWith('DELETE FROM `mock` WHERE isActive = 0')
     })
   })
 
   describe('insert', () => {
     it('should return correct insert script with single line', () => {
-      const result = Builder.insert({ name: 'test', age: 5, isActive: true })
-      expect(result).toBe("INSERT INTO `mock` (name, age, isActive) VALUES ('test', 5, 1)")
+      Builder.insert({ name: 'test', age: 5, isActive: true })
+      expect(mockQuery).toHaveBeenCalledWith(
+        "INSERT INTO `mock` (name, age, isActive) VALUES ('test', 5, 1)"
+      )
     })
 
     it('should return correct insert script with multiple lines', () => {
-      const result = Builder.insert([
+      Builder.insert([
         { name: 'test', age: 5 },
         { name: 'test2', age: 6, isActive: false },
       ])
-      expect(result).toBe(
+      expect(mockQuery).toHaveBeenCalledWith(
         "INSERT INTO `mock` (name, age, isActive) VALUES ('test', 5, NULL), ('test2', 6, 0)"
       )
     })
@@ -93,23 +101,23 @@ describe('builder', () => {
 
   describe('select', () => {
     it('should return correct select script with no params', () => {
-      const result = Builder.select()
-      expect(result).toBe('SELECT * FROM `mock`')
+      Builder.select()
+      expect(mockQuery).toHaveBeenCalledWith('SELECT * FROM `mock`')
     })
 
     it('should return correct select script with columns params', () => {
-      const result = Builder.select({ $columns: ['name', 'age'] })
-      expect(result).toBe('SELECT name, age FROM `mock`')
+      Builder.select({ $columns: ['name', 'age'] })
+      expect(mockQuery).toHaveBeenCalledWith('SELECT name, age FROM `mock`')
     })
 
     it('should return correct select script with where params', () => {
-      const result = Builder.select({ $where: { age: 5 } })
-      expect(result).toBe('SELECT * FROM `mock` WHERE age = 5')
+      Builder.select({ $where: { age: 5 } })
+      expect(mockQuery).toHaveBeenCalledWith('SELECT * FROM `mock` WHERE age = 5')
     })
 
     it('should return correct select script with where params and columns params', () => {
-      const result = Builder.select({ $where: { age: 5 }, $columns: ['name', 'age'] })
-      expect(result).toBe('SELECT name, age FROM `mock` WHERE age = 5')
+      Builder.select({ $where: { age: 5 }, $columns: ['name', 'age'] })
+      expect(mockQuery).toHaveBeenCalledWith('SELECT name, age FROM `mock` WHERE age = 5')
     })
 
     it('should return correct select script with joins', () => {
@@ -121,8 +129,13 @@ describe('builder', () => {
         .join(mockModel2.as<'r'>('r'), {
           'm.id': 'r.receiverId',
         })
-      const result = builder<any>(mockJoin).select()
-      expect(result).toBe(
+      builder<any>({
+        ...mockJoin,
+        connection: {
+          query: mockQuery,
+        },
+      }).select()
+      expect(mockQuery).toHaveBeenCalledWith(
         'SELECT * FROM `mock` AS m INNER JOIN `mock2` AS s ON m.id = s.senderId INNER JOIN `mock2` AS r ON m.id = r.receiverId'
       )
     })
@@ -130,32 +143,34 @@ describe('builder', () => {
 
   describe('update', () => {
     it('should return correct update script', () => {
-      const result = Builder.update({ isActive: true, name: 'Test User' }, { id: 1 })
-      expect(result).toBe("UPDATE `mock` SET isActive = 1, name = 'Test User' WHERE id = 1")
+      Builder.update({ isActive: true, name: 'Test User' }, { id: 1 })
+      expect(mockQuery).toHaveBeenCalledWith(
+        "UPDATE `mock` SET isActive = 1, name = 'Test User' WHERE id = 1"
+      )
     })
   })
 
   describe('truncate', () => {
     it('should return correct truncate script', () => {
-      const result = Builder.truncate()
-      expect(result).toBe('TRUNCATE TABLE `mock`')
+      Builder.truncate()
+      expect(mockQuery).toHaveBeenCalledWith('TRUNCATE TABLE `mock`')
     })
   })
 
   describe('upsert', () => {
     it('should return correct upsert script with single line', () => {
-      const result = Builder.upsert({ name: 'test', age: 5, isActive: true })
-      expect(result).toBe(
+      Builder.upsert({ name: 'test', age: 5, isActive: true })
+      expect(mockQuery).toHaveBeenCalledWith(
         "INSERT INTO `mock` (name, age, isActive) VALUES ('test', 5, 1) ON DUPLICATE KEY UPDATE name = 'test', age = 5, isActive = 1"
       )
     })
 
     it('should return correct upsert script with multiple lines', () => {
-      const result = Builder.upsert([
+      Builder.upsert([
         { name: 'test', age: 5 },
         { name: 'test2', age: 6, isActive: false },
       ])
-      expect(result).toBe(
+      expect(mockQuery).toHaveBeenCalledWith(
         "INSERT INTO `mock` (name, age, isActive) VALUES ('test', 5, NULL), ('test2', 6, 0) AS MANY ON DUPLICATE KEY UPDATE name = MANY.name, age = MANY.age, isActive = MANY.isActive"
       )
     })

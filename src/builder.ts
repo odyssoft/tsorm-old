@@ -1,15 +1,6 @@
+import { Builder } from './types/builder'
 import operator, { formatValue } from './operator'
 import { JoinModelType, ModelType, SelectOptions, UpdateOptions, Where } from './types'
-
-type Builder<T> = {
-  [key: string]: any
-  delete: (options: Where<T>) => string
-  insert: (data: T | T[]) => string
-  select: (options?: SelectOptions<T>) => string
-  truncate: () => string
-  update: (data: Partial<T>, options: UpdateOptions<T>) => string
-  upsert: (data: T | T[]) => string
-}
 
 export function builder<T>({
   alias,
@@ -26,16 +17,21 @@ export function builder<T>({
     )
   })
   return {
-    delete(options: Where<T>): string {
-      return `DELETE FROM ${table} WHERE ${parseOptions(options, keys)}`
+    delete(options: Where<T>) {
+      const sql: string = `DELETE FROM ${table} WHERE ${parseOptions(options, keys)}`
+      return rest.connection.query(sql)
     },
 
-    insert(data: T | T[]): string {
+    insert(data: T | T[]) {
       const keys: string[] = getInsertKeys<T>(data)
-      return `INSERT INTO ${table} (${keys.join(', ')}) ${getInsertValues<T>(data, keys)}`
+      const sql: string = `INSERT INTO ${table} (${keys.join(', ')}) ${getInsertValues<T>(
+        data,
+        keys
+      )}`
+      return rest.connection.query(sql)
     },
 
-    select(options?: SelectOptions<T> | undefined): string {
+    select(options?: SelectOptions<T> | undefined) {
       const sql: string[] = [
         `SELECT ${options?.$columns ? options.$columns.join(', ') : '*'} FROM ${table}`,
       ]
@@ -48,22 +44,22 @@ export function builder<T>({
 
       options?.$where && sql.push(`WHERE ${parseOptions(options.$where, keys)}`)
 
-      return sql.join(' ')
+      return rest.connection.query(sql.join(' '))
     },
 
-    truncate(): string {
-      return `TRUNCATE TABLE \`${name}\``
+    truncate() {
+      return rest.connection.query(`TRUNCATE TABLE \`${name}\``)
     },
 
-    update(data: Partial<T>, options: UpdateOptions<T>): string {
+    update(data: Partial<T>, options: UpdateOptions<T>) {
       const sql: string[] = [`UPDATE ${table} SET`]
       const values = Object.keys(data).map((key) => parseValue(key, (data as any)[key], keys))
       sql.push(values.join(', '))
       sql.push(`WHERE ${parseOptions(options, keys)}`)
-      return sql.join(' ')
+      return rest.connection.query(sql.join(' '))
     },
 
-    upsert(data: T | T[]): string {
+    upsert(data: T | T[]) {
       const keys: string[] = getInsertKeys<T>(data)
       const sql: string[] = [
         `INSERT INTO ${table} (${keys.join(', ')}) ${getInsertValues<T>(data, keys)}`,
@@ -80,7 +76,7 @@ export function builder<T>({
           rows.push(`${key} = ${Array.isArray(data) ? `MANY.${key}` : formatValue(data[key])}`)
         )
       sql.push(rows.join(', '))
-      return sql.join(' ')
+      return rest.connection.query(sql.join(' '))
     },
   }
 }
