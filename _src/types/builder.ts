@@ -11,5 +11,5 @@ export type Builder<T> = {
   select: (options?: SelectOptions<T>) => Promise<[RowDataPacket[], FieldPacket[]]>
   truncate: () => Promise<[OkPacket, FieldPacket[]]>
   update: (data: Partial<T>, options: UpdateOptions<T>) => Promise<[OkPacket, FieldPacket[]]>
-  upsert: (data: T | T[]) => Promise<[OkPacket, FieldPacket[]]>
+  upsert: (data: Partial<T> | Partial<T>[]) => Promise<[OkPacket, FieldPacket[]]>
 }

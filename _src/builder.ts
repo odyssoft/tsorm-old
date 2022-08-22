@@ -59,10 +59,10 @@ export function builder<T>({
       return rest.connection.query(sql.join(' '))
     },
 
-    upsert(data: T | T[]) {
-      const keys: string[] = getInsertKeys<T>(data)
+    upsert(data: Partial<T> | Partial<T>[]) {
+      const keys: string[] = getInsertKeys<Partial<T>>(data)
       const sql: string[] = [
-        `INSERT INTO ${table} (${keys.join(', ')}) ${getInsertValues<T>(data, keys)}`,
+        `INSERT INTO ${table} (${keys.join(', ')}) ${getInsertValues<Partial<T>>(data, keys)}`,
       ]
 
       Array.isArray(data) && sql.push('AS MANY')

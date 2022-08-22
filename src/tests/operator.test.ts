@@ -19,7 +19,7 @@ const mockKeys: ModelKeys<IMock> = {
 
 describe('Operator', () => {
   describe('operator()', () => {
-    const Operator = operator<IMock>('id', mockKeys)
+    const Operator = operator<IMock>('id', Object.keys(mockKeys))
     it('should return an object with all the operator functions', () => {
       expect(Operator).toHaveProperty('$between')
       expect(Operator).toHaveProperty('$equals')
@@ -134,12 +134,12 @@ describe('Operator', () => {
     })
 
     it('should return key when key is passed', () => {
-      const result = formatValue<IMock>('id', mockKeys)
+      const result = formatValue('id', Object.keys(mockKeys))
       expect(result).toBe('id')
     })
 
     it('should return aliased key when aliased key is passed', () => {
-      const result = formatValue<IMockAlias>('t.id', mockAliasKeys)
+      const result = formatValue('t.id', Object.keys(mockAliasKeys))
       expect(result).toBe('t.id')
     })
   })

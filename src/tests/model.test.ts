@@ -25,4 +25,9 @@ describe('model', () => {
     const alias = mockModel.as('m')
     expect(alias.alias).toBe('m')
   })
+
+  describe('delete', () => {})
+  describe('insert', () => {})
+  describe('select', () => {})
+  describe('update', () => {})
 })
