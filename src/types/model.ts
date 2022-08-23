@@ -1,3 +1,4 @@
+import { FieldPacket, OkPacket, RowDataPacket } from 'mysql2'
 import { ColumnOptions, Indexable, KeyOf, Or, OperatorType } from './'
 
 export type AliasModelKeys<T, A extends string> = {
@@ -12,17 +13,13 @@ export interface BaseModelType<T> {
   [key: string]: any
   keys: ModelKeys<T>
   name: string
-  delete: Delete<T>
-  insert: Insert<T>
-  select: Select<T>
-  update: Update<T>
+  delete: (options: Where<T>) => Promise<[OkPacket, FieldPacket[]]>
+  insert: (data: T | T[]) => Promise<[OkPacket, FieldPacket[]]>
+  select: (options?: SelectOptions<T>) => Promise<[RowDataPacket[], FieldPacket[]]>
+  truncate: () => Promise<[OkPacket, FieldPacket[]]>
+  update: (data: Partial<T>, options: Where<T>) => Promise<[OkPacket, FieldPacket[]]>
+  upsert: (data: Partial<T> | Partial<T>[]) => Promise<[OkPacket, FieldPacket[]]>
 }
-
-export type Delete<T> = (options: Where<T>) => void
-export type DeleteOptions<T, A = any> = Where<A extends string ? AliasModelKeys<T, A> : T>
-
-export type Insert<T> = (data: T | T[]) => void
-export type InsertOptions<T> = Where<T>
 
 export type JoinOptions<T> = {
   [Key in KeyOf<T>]?: number | null | OperatorType<T> | OperatorType<T>[]
@@ -48,9 +45,6 @@ export interface SelectOptions<T> {
   $columns?: KeyOf<T>[]
   $where?: Where<T>
 }
-
-export type Update<T> = (data: Partial<T>, options: UpdateOptions<T>) => void
-export type UpdateOptions<T> = Where<T>
 
 interface StringOverride extends String {}
 

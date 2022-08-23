@@ -1,4 +1,4 @@
-import { getInsertKeys, getInsertValues, parseOptions, parseValue } from './utils'
+import { formatValue, getInsertKeys, getInsertValues, parseOptions, parseValue } from './utils'
 import {
   AliasModelKeys,
   AliasModelType,
@@ -6,9 +6,9 @@ import {
   ModelKeys,
   ModelType,
   SelectOptions,
-  UpdateOptions,
   Where,
 } from './types'
+import { OkPacket } from 'mysql2'
 
 export function model<T>(name: string, keys: ModelKeys<T>): ModelType<T> {
   return {
@@ -90,7 +90,7 @@ export function model<T>(name: string, keys: ModelKeys<T>): ModelType<T> {
       return this.connection.query(`TRUNCATE TABLE \`${name}\``)
     },
 
-    update(data: Partial<T>, options: UpdateOptions<T>) {
+    update(data: Partial<T>, options: Where<T>) {
       const sql: string[] = [`UPDATE ${this.getTable()} SET`]
       const values = Object.keys(data).map((key) =>
         parseValue(key, (data as any)[key], this.getKeys())
@@ -100,7 +100,7 @@ export function model<T>(name: string, keys: ModelKeys<T>): ModelType<T> {
       return this.connection.query(sql.join(' '))
     },
 
-    upsert(data: Partial<T> | Partial<T>[], options: UpdateOptions<T>) {
+    upsert(data: Partial<T> | Partial<T>[]) {
       const keys: string[] = getInsertKeys<Partial<T>>(data)
       const sql: string[] = [
         `INSERT INTO ${this.getTable()} (${keys.join(', ')}) ${getInsertValues<Partial<T>>(
@@ -120,7 +120,8 @@ export function model<T>(name: string, keys: ModelKeys<T>): ModelType<T> {
           rows.push(`${key} = ${Array.isArray(data) ? `MANY.${key}` : formatValue(data[key])}`)
         )
       sql.push(rows.join(', '))
-      return this.connection.query(sql.join(' '))
+      //  @ts-ignore
+      return this.connection.query<OkPacket>(sql.join(' '))
     },
   }
 }

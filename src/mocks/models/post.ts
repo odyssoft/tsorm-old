@@ -6,7 +6,7 @@ export interface IMockPost {
   post: string
 }
 
-const mockPost = model<IMockPost>('comment', {
+const mockPost = model<IMockPost>('post', {
   postId: {
     autoIncrement: true,
     primaryKey: true,
