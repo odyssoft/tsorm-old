@@ -1,5 +1,7 @@
-import { ColumnOptions, ConnectionOptions, ModelType, SchemaType } from './types'
 import { createPool } from 'mysql2/promise'
+
+import { ConnectionOptions, ModelType, SchemaType } from './types'
+import { mapKey } from './utils'
 
 export function Schema<T>(name: string, options: ConnectionOptions): SchemaType<T> {
   const connection = createPool(options)
@@ -12,36 +14,23 @@ export function Schema<T>(name: string, options: ConnectionOptions): SchemaType<
     connection,
     name,
     models: {},
+
     close() {
       connection.end()
     },
-    addModel<T>(model: ModelType<T>): ModelType<T> {
-      const sql: string[] = [`CREATE TABLE IF NOT EXISTS ${model.name} (`]
-      const columns: string[] = []
-      Object.keys(model.keys).forEach((key) =>
-        columns.push(`${key} ${mapKey(key, model.keys[key])}`)
+
+    addModel<T>(model: ModelType<T>): any {
+      connection.query(
+        `CREATE TABLE IF NOT EXISTS ${model.name} (${Object.keys(model.keys)
+          .map((key) => `${key} ${mapKey(key, model.keys[key])}`)
+          .join(', ')})`
       )
-      sql.push(`${columns.join(', ')} )`)
-      connection.query(sql.join(' '))
       // @ts-ignore
       this.models[model.name] = model.keys
       model.connection = connection
       return model
     },
   }
-}
-
-export const mapKey = (key: string, options: ColumnOptions) => {
-  const tableKey: string[] = [`\`${key}\``]
-  tableKey.push(`${options.type}${options.length ? `(${options.length})` : ''}`)
-  options.autoIncrement && tableKey.push('AUTO_INCREMENT')
-  options.primaryKey && tableKey.push('PRIMARY KEY')
-  options.required && tableKey.push('NOT NULL')
-  options.default !== undefined &&
-    tableKey.push(
-      `DEFAULT ${typeof options.default === 'string' ? `'${options.default}'` : options.default}`
-    )
-  return tableKey.join(' ')
 }
 
 export default Schema

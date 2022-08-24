@@ -1,14 +1,14 @@
-import MySchema from 'example/schema'
-import { model } from '../../'
+import MySchema from '../schema'
+import createModel from '../../model'
 
 export interface IComment {
-  commentId?: number
-  userId: number
-  postId: number
+  commentId?: string
+  userId: string
+  postId: string
   comment: string
 }
 
-const comment = model<IComment>('comment', {
+const comment = createModel<IComment>('comment', {
   commentId: {
     autoIncrement: true,
     primaryKey: true,
@@ -21,7 +21,8 @@ const comment = model<IComment>('comment', {
   },
   postId: {
     required: true,
-    type: 'INT',
+    type: 'VARCHAR',
+    length: 255,
   },
   comment: {
     required: true,
@@ -30,6 +31,6 @@ const comment = model<IComment>('comment', {
   },
 })
 
-const Comment = MySchema.addModel(comment)
+const Comment = MySchema.addModel<IComment>(comment)
 
 export default Comment

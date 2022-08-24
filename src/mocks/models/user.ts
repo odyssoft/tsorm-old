@@ -1,20 +1,15 @@
-import MySchema from '../schema'
 import { model } from '../../'
 
-export interface IUser {
-  userId?: string
+export interface IMockUser {
+  userId?: number
   name: string
   age: number
 }
 
-const user = model<IUser>('user', {
+const mockUser = model<IMockUser>('user', {
   userId: {
-    type: 'INT',
     autoIncrement: true,
     primaryKey: true,
-    required: true,
-  },
-  age: {
     required: true,
     type: 'INT',
   },
@@ -23,8 +18,10 @@ const user = model<IUser>('user', {
     type: 'VARCHAR',
     length: 255,
   },
+  age: {
+    required: true,
+    type: 'INT',
+  },
 })
 
-const User = MySchema.addModel<IUser>(user)
-
-export default User
+export default mockUser

@@ -5,6 +5,7 @@
   "main": "lib/index.js",
   "scripts": {
     "test": "jest",
+    "start": "ts-node src/test.ts",
     "coverage": "jest --coverage"
   },
   "repository": {

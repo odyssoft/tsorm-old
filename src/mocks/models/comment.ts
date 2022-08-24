@@ -1,14 +1,13 @@
-import MySchema from 'example/schema'
 import { model } from '../../'
 
-export interface IComment {
+export interface IMockComment {
   commentId?: number
   userId: number
   postId: number
   comment: string
 }
 
-const comment = model<IComment>('comment', {
+const mockComment = model<IMockComment>('comment', {
   commentId: {
     autoIncrement: true,
     primaryKey: true,
@@ -30,6 +29,4 @@ const comment = model<IComment>('comment', {
   },
 })
 
-const Comment = MySchema.addModel(comment)
-
-export default Comment
+export default mockComment

@@ -1,3 +1,4 @@
+import { IUser } from 'example/models/user'
 import { KeyOf, Where } from './'
 
 export interface SelectOptions<T> {

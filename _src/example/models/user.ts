@@ -1,5 +1,5 @@
 import MySchema from '../schema'
-import { model } from '../../'
+import createModel from '../../model'
 
 export interface IUser {
   userId?: string
@@ -7,12 +7,12 @@ export interface IUser {
   age: number
 }
 
-const user = model<IUser>('user', {
+const user = createModel<IUser>('user', {
   userId: {
-    type: 'INT',
     autoIncrement: true,
     primaryKey: true,
     required: true,
+    type: 'INT',
   },
   age: {
     required: true,

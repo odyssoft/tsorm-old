@@ -1,13 +1,12 @@
-import MySchema from 'example/schema'
 import { model } from '../../'
 
-export interface IPost {
+export interface IMockPost {
   postId?: number
   userId: number
   post: string
 }
 
-const post = model<IPost>('post', {
+const mockPost = model<IMockPost>('post', {
   postId: {
     autoIncrement: true,
     primaryKey: true,
@@ -25,6 +24,4 @@ const post = model<IPost>('post', {
   },
 })
 
-const Post = MySchema.addModel(post)
-
-export default Post
+export default mockPost
