@@ -55,7 +55,8 @@ export function model<T>(name: string, keys: ModelKeys<T>): ModelType<T> {
         options,
         this.getKeys()
       )}`
-      return this.connection?.query(sql)
+      this.reset()
+      return this.connection.query(sql)
     },
 
     insert(data: T | T[]) {
@@ -64,6 +65,7 @@ export function model<T>(name: string, keys: ModelKeys<T>): ModelType<T> {
         data,
         keys
       )}`
+      this.reset()
       return this.connection.query(sql)
     },
 
@@ -83,10 +85,12 @@ export function model<T>(name: string, keys: ModelKeys<T>): ModelType<T> {
 
       options?.$where && sql.push(`WHERE ${parseOptions(options.$where, this.getKeys())}`)
 
+      this.reset()
       return this.connection.query(sql.join(' '))
     },
 
     truncate() {
+      this.reset()
       return this.connection.query(`TRUNCATE TABLE \`${name}\``)
     },
 
@@ -97,6 +101,7 @@ export function model<T>(name: string, keys: ModelKeys<T>): ModelType<T> {
       )
       sql.push(values.join(', '))
       sql.push(`WHERE ${parseOptions(options, this.getKeys())}`)
+      this.reset()
       return this.connection.query(sql.join(' '))
     },
 
@@ -120,8 +125,17 @@ export function model<T>(name: string, keys: ModelKeys<T>): ModelType<T> {
           rows.push(`${key} = ${Array.isArray(data) ? `MANY.${key}` : formatValue(data[key])}`)
         )
       sql.push(rows.join(', '))
+      this.reset()
       //  @ts-ignore
       return this.connection.query<OkPacket>(sql.join(' '))
+    },
+
+    reset() {
+      this.keys = keys
+      this.joins = []
+      this.name = name
+      //  @ts-ignore
+      this.alias = undefined
     },
   }
 }

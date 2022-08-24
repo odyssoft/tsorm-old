@@ -14,7 +14,8 @@ export const formatValue = (
   input: boolean | number | string | null | undefined,
   keys?: string[]
 ): number | string => {
-  if (['null', 'undefined'].includes(typeof input)) {
+  console.log({ input: typeof input })
+  if (typeof input === 'undefined' || input === null) {
     return 'NULL'
   }
   if (typeof input === 'number') {
@@ -100,7 +101,7 @@ export const parseOptions = (options: any, keys?: string[]): string =>
           : options[key].map((i: number) => parseValue(key, options[key][i], keys)).join(' AND ')
         : parseValue(key, options[key], keys)
     )
-    .join(' ')}`
+    .join(' AND ')}`
 
 export const parseValue = (key: string, value: any, keys?: string[]): string => {
   if (value === null) {

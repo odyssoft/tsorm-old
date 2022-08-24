@@ -90,10 +90,8 @@ describe('model', () => {
     })
 
     it('should call query with correct select sql using joins', (done) => {
-      const result = User.as<'u'>('u')
-        .join(Post.as<'p'>('p'), {
-          'u.userId': 'p.userId',
-        })
+      User.as<'u'>('u')
+        .join(Post.as<'p'>('p'), { 'u.userId': 'p.userId' })
         .select()
         .then(() => {
           expect(mockQuery).toHaveBeenCalledWith(
@@ -112,70 +110,68 @@ describe('model', () => {
     })
   })
 
-  // describe('update()', () => {
-  //   it('should call query with correct update sql', (done) => {
-  //     const result = User.update(
-  //       {
-  //         name: 'Not Test',
-  //       },
-  //       {
-  //         name: 'Test',
-  //       }
-  //     ).then(() => {
-  //       expect(mockQuery).toHaveBeenCalledWith(
-  //         "UPDATE `user` SET name = 'Not Test' WHERE name = 'Test'"
-  //       )
-  //       done()
-  //     })
-  //   })
-  // })
+  describe('update()', () => {
+    it('should call query with correct update sql', (done) => {
+      User.update(
+        {
+          name: 'Not Test',
+        },
+        {
+          name: 'Test',
+        }
+      ).then(() => {
+        expect(mockQuery).toHaveBeenCalledWith(
+          "UPDATE `user` SET name = 'Not Test' WHERE name = 'Test'"
+        )
+        done()
+      })
+    })
+  })
 
-  // describe('upsert()', () => {
-  //   it('should call query with correct upsert sql for single upsert', (done) => {
-  //     const result = User.upsert({
-  //       age: 27,
-  //       name: 'Test',
-  //     }).then(() => {
-  //       expect(mockQuery).toHaveBeenCalledWith(
-  //         "INSERT INTO `user` (age, name) VALUES (27, 'Test') ON DUPLICATE KEY UPDATE age = 27, name = 'Test'"
-  //       )
-  //       done()
-  //     })
-  //   })
+  describe('upsert()', () => {
+    it('should call query with correct upsert sql for single upsert', (done) => {
+      User.upsert({
+        age: 27,
+        name: 'Test',
+      }).then(() => {
+        expect(mockQuery).toHaveBeenCalledWith(
+          "INSERT INTO `user` (age, name) VALUES (27, 'Test') ON DUPLICATE KEY UPDATE age = 27, name = 'Test'"
+        )
+        done()
+      })
+    })
 
-  //   it('should call query with correct upsert sql for multiple upserts', (done) => {
-  //     const result = User.upsert([
-  //       {
-  //         age: 27,
-  //         name: 'Test',
-  //       },
-  //       {
-  //         age: 29,
-  //         name: 'User',
-  //       },
-  //     ]).then(() => {
-  //       expect(mockQuery).toHaveBeenCalledWith(
-  //         "INSERT INTO `user` (age, name) VALUES (27, 'Test'), (29, 'User') AS MANY ON DUPLICATE KEY UPDATE age = MANY.age, name = MANY.name"
-  //       )
-  //       done()
-  //     })
-  //   })
-  // })
+    it('should call query with correct upsert sql for multiple upserts', (done) => {
+      User.upsert([
+        {
+          age: 27,
+          name: 'Test',
+        },
+        {
+          age: 29,
+          name: 'User',
+        },
+      ]).then(() => {
+        expect(mockQuery).toHaveBeenCalledWith(
+          "INSERT INTO `user` (age, name) VALUES (27, 'Test'), (29, 'User') AS MANY ON DUPLICATE KEY UPDATE age = MANY.age, name = MANY.name"
+        )
+        done()
+      })
+    })
+  })
 
-  // describe('getKeys()', () => {
-  //   it('should return default keys without joins', () => {
-  //     //  @ts-ignore
-  //     const keys = User.getKeys()
-  //     expect(keys).toEqual(['userId', 'name', 'age'])
-  //   })
+  describe('getKeys()', () => {
+    it('should return default keys without joins', () => {
+      //  @ts-ignore
+      const keys = User.getKeys()
+      expect(keys).toEqual(['userId', 'name', 'age'])
+    })
 
-  //   it('should return aliased keys with joins', () => {
-  //     const joinedModel = User.as<'u'>('u').join(Post.as<'p'>('p'), {
-  //       'u.userId': 'p.userId',
-  //     })
-  //     //  @ts-ignore
-  //     const keys = joinedModel.getKeys()
-  //     expect(keys).toEqual(['u.userId', 'u.name', 'u.age', 'p.postId', 'p.userId', 'p.post'])
-  //   })
-  // })
+    it('should return aliased keys with joins', () => {
+      const join = User.as<'u'>('u').join(Post.as<'p'>('p'), { 'u.userId': 'p.userId' })
+      //  @ts-ignore
+      const keys = join.getKeys()
+      expect(keys).toEqual(['u.userId', 'u.name', 'u.age', 'p.postId', 'p.userId', 'p.post'])
+    })
+  })
 })

@@ -1,6 +1,6 @@
 import { createPool } from 'mysql2/promise'
 
-import { ConnectionOptions, SchemaType } from './types'
+import { ConnectionOptions, ModelType, SchemaType } from './types'
 import { mapKey } from './utils'
 
 export function Schema<T>(name: string, options: ConnectionOptions): SchemaType<T> {
@@ -19,7 +19,7 @@ export function Schema<T>(name: string, options: ConnectionOptions): SchemaType<
       connection.end()
     },
 
-    addModel<T>(model: any): any {
+    addModel<T>(model: ModelType<T>): any {
       connection.query(
         `CREATE TABLE IF NOT EXISTS ${model.name} (${Object.keys(model.keys)
           .map((key) => `${key} ${mapKey(key, model.keys[key])}`)
