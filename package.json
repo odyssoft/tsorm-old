@@ -1,16 +1,17 @@
 {
-  "name": "@odyssoft/tssql",
+  "name": "@odyssoft/tsorm",
   "version": "1.0.0",
   "description": "TypeScript ORM for MySQL",
   "main": "lib/index.js",
   "scripts": {
+    "build": "tsc",
     "test": "jest",
     "start": "ts-node src/test.ts",
     "coverage": "jest --coverage"
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/odyssoft/tssql.git"
+    "url": "git+https://github.com/odyssoft/tsorm.git"
   },
   "keywords": [
     "TypeScript",
@@ -24,9 +25,9 @@
   "author": "Sean Hewitson",
   "license": "ISC",
   "bugs": {
-    "url": "https://github.com/odyssoft/tssql/issues"
+    "url": "https://github.com/odyssoft/tsorm/issues"
   },
-  "homepage": "https://github.com/odyssoft/tssql#readme",
+  "homepage": "https://github.com/odyssoft/tsorm#readme",
   "dependencies": {
     "mysql2": "^2.3.3"
   },
