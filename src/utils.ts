@@ -14,7 +14,6 @@ export const formatValue = (
   input: boolean | number | string | null | undefined,
   keys?: string[]
 ): number | string => {
-  console.log({ input: typeof input })
   if (typeof input === 'undefined' || input === null) {
     return 'NULL'
   }
@@ -93,12 +92,8 @@ export const operator = <T>(key: string, keys?: string[]) => ({
 export const parseOptions = (options: any, keys?: string[]): string =>
   `${Object.keys(options as any)
     .map((key) =>
-      Array.isArray(options[key])
-        ? key === '$or'
-          ? `(${options[key]
-              .map((i: number) => parseValue(key, options[key][i], keys))
-              .join(' OR ')})`
-          : options[key].map((i: number) => parseValue(key, options[key][i], keys)).join(' AND ')
+      key === '$or'
+        ? `(${options[key].map((value: any) => parseOptions(value, keys)).join(' OR ')})`
         : parseValue(key, options[key], keys)
     )
     .join(' AND ')}`

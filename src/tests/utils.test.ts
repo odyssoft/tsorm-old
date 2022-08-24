@@ -281,6 +281,14 @@ describe('utils', () => {
       })
       expect(result).toBe("name = 'test' AND age BETWEEN 20 AND 30")
     })
+
+    it('should return correct options with a single object with $or', () => {
+      const result = parseOptions({
+        name: 'test',
+        $or: [{ age: 20 }, { age: 27 }],
+      })
+      expect(result).toBe("name = 'test' AND (age = 20 OR age = 27)")
+    })
   })
 
   describe('parseValue', () => {
