@@ -10,7 +10,7 @@ import {
 } from './types'
 import { OkPacket } from 'mysql2'
 
-export function model<T>(name: string, keys: ModelKeys<T>): ModelType<T> {
+export function createModel<T>(name: string, keys: ModelKeys<T>): ModelType<T> {
   return {
     joins: [],
     keys,
@@ -56,6 +56,7 @@ export function model<T>(name: string, keys: ModelKeys<T>): ModelType<T> {
         this.getKeys()
       )}`
       this.reset()
+      //  @ts-ignore
       return this.connection.query(sql)
     },
 
@@ -66,6 +67,7 @@ export function model<T>(name: string, keys: ModelKeys<T>): ModelType<T> {
         keys
       )}`
       this.reset()
+      //  @ts-ignore
       return this.connection.query(sql)
     },
 
@@ -86,11 +88,13 @@ export function model<T>(name: string, keys: ModelKeys<T>): ModelType<T> {
       options?.$where && sql.push(`WHERE ${parseOptions(options.$where, this.getKeys())}`)
 
       this.reset()
+      //  @ts-ignore
       return this.connection.query(sql.join(' '))
     },
 
     truncate() {
       this.reset()
+      //  @ts-ignore
       return this.connection.query(`TRUNCATE TABLE \`${name}\``)
     },
 
@@ -102,6 +106,7 @@ export function model<T>(name: string, keys: ModelKeys<T>): ModelType<T> {
       sql.push(values.join(', '))
       sql.push(`WHERE ${parseOptions(options, this.getKeys())}`)
       this.reset()
+      //  @ts-ignore
       return this.connection.query(sql.join(' '))
     },
 

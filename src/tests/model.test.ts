@@ -1,5 +1,4 @@
-import mockPost from '../mocks/models/post'
-import mockUser from '../mocks/models/user'
+import { mockPost, mockUser } from '../mocks/models'
 
 let mockPromise = Promise.resolve([{}])
 const mockQuery = jest.fn(() => mockPromise)

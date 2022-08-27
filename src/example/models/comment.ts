@@ -1,5 +1,4 @@
-import MySchema from 'example/schema'
-import { model } from '../../'
+import { createModel } from '../../'
 
 export interface IComment {
   commentId?: number
@@ -8,7 +7,7 @@ export interface IComment {
   comment: string
 }
 
-const comment = model<IComment>('comment', {
+export const comment = createModel<IComment>('comment', {
   commentId: {
     autoIncrement: true,
     primaryKey: true,
@@ -29,7 +28,3 @@ const comment = model<IComment>('comment', {
     length: 255,
   },
 })
-
-const Comment = MySchema.addModel(comment)
-
-export default Comment

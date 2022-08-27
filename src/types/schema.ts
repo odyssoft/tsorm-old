@@ -8,8 +8,8 @@ export interface ConnectionOptions extends PoolOptions {
   user: string
 }
 
-type Models<T> = {
-  [K in keyof T]?: ModelType<T[K]>
+export type Models<T> = {
+  [K in keyof T]: ModelType<T[K]>
 }
 
 export type SchemaType<T> = {
@@ -17,7 +17,6 @@ export type SchemaType<T> = {
   models: Models<T>
   name: string
 
-  addModel: <T>(model: ModelType<T>) => ModelType<T>
   close: () => void
 }
 

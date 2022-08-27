@@ -1,4 +1,4 @@
-import { model } from '../../'
+import { createModel } from '../../'
 
 export interface IMockUser {
   userId?: number
@@ -6,7 +6,7 @@ export interface IMockUser {
   age: number
 }
 
-const mockUser = model<IMockUser>('user', {
+export const mockUser = createModel<IMockUser>('user', {
   userId: {
     autoIncrement: true,
     primaryKey: true,
@@ -23,5 +23,3 @@ const mockUser = model<IMockUser>('user', {
     type: 'INT',
   },
 })
-
-export default mockUser

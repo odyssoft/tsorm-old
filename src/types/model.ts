@@ -1,4 +1,5 @@
 import { FieldPacket, OkPacket, RowDataPacket } from 'mysql2'
+import { Pool } from 'mysql2/promise'
 import { ColumnOptions, Indexable, KeyOf, Or, OperatorType } from './'
 
 export type AliasModelKeys<T, A extends string> = {
@@ -11,6 +12,7 @@ export interface AliasModelType<T, A extends string> extends JoinModelType<Alias
 
 export interface BaseModelType<T> {
   [key: string]: any
+  connection?: Pool
   keys: ModelKeys<T>
   name: string
   delete: (options: Where<T>) => Promise<[OkPacket, FieldPacket[]]>

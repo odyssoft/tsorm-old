@@ -1,4 +1,4 @@
-import { model } from '../../'
+import { createModel } from '../../'
 
 export interface IMockPost {
   postId?: number
@@ -6,7 +6,7 @@ export interface IMockPost {
   post: string
 }
 
-const mockPost = model<IMockPost>('post', {
+export const mockPost = createModel<IMockPost>('post', {
   postId: {
     autoIncrement: true,
     primaryKey: true,
@@ -23,5 +23,3 @@ const mockPost = model<IMockPost>('post', {
     length: 255,
   },
 })
-
-export default mockPost

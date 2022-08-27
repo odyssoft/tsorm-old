@@ -1,5 +1,4 @@
-import MySchema from 'example/schema'
-import { model } from '../../'
+import { createModel } from '../../'
 
 export interface IPost {
   postId?: number
@@ -7,7 +6,7 @@ export interface IPost {
   post: string
 }
 
-const post = model<IPost>('post', {
+export const post = createModel<IPost>('post', {
   postId: {
     autoIncrement: true,
     primaryKey: true,
@@ -24,7 +23,3 @@ const post = model<IPost>('post', {
     length: 255,
   },
 })
-
-const Post = MySchema.addModel(post)
-
-export default Post

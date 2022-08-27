@@ -1,8 +1,8 @@
 import { PoolOptions } from 'mysql2/typings/mysql'
 import { IMySchema } from '../mocks/schema'
-import { Schema } from '../'
+import { createSchema } from '../'
 import { ConnectionOptions } from '../types'
-import mockUser from '../mocks/models/user'
+import { mockPost, mockUser } from '../mocks/models'
 
 const mockEnd = jest.fn()
 let mockPromise = Promise.resolve([])
@@ -24,22 +24,28 @@ const mockOptions: ConnectionOptions = {
   user: 'user',
 }
 
-describe('Schema', () => {
+describe('createSchema', () => {
   it('should call createPool with correct params', (done) => {
-    Schema<IMySchema>('test', mockOptions)
+    createSchema<IMySchema>('test', mockOptions, { user: mockUser, post: mockPost })
     setTimeout(() => {
-      expect(mockCreatePool).toHaveBeenCalledWith(mockOptions)
-      expect(mockQuery).toHaveBeenCalledWith(`CREATE DATABASE IF NOT EXISTS test; USE test`)
+      expect(mockCreatePool).toHaveBeenCalledWith({
+        ...mockOptions,
+        multipleStatements: true,
+      })
+      expect(mockQuery).toHaveBeenCalledWith('CREATE DATABASE IF NOT EXISTS `test`; USE `test`;')
       done()
     }, 250)
   })
 
   it('should call end when create query fails', (done) => {
     mockPromise = Promise.reject(new Error('Something went wrong'))
-    Schema<IMySchema>('test', mockOptions)
+    createSchema<IMySchema>('test', mockOptions, { user: mockUser, post: mockPost })
     setTimeout(() => {
-      expect(mockCreatePool).toHaveBeenCalledWith(mockOptions)
-      expect(mockQuery).toHaveBeenCalledWith(`CREATE DATABASE IF NOT EXISTS test; USE test`)
+      expect(mockCreatePool).toHaveBeenCalledWith({
+        ...mockOptions,
+        multipleStatements: true,
+      })
+      expect(mockQuery).toHaveBeenCalledWith('CREATE DATABASE IF NOT EXISTS `test`; USE `test`;')
       expect(mockEnd).toHaveBeenCalled()
       done()
     }, 250)
@@ -48,22 +54,18 @@ describe('Schema', () => {
   it('should call end when user closes schema', (done) => {
     jest.clearAllMocks()
     mockPromise = Promise.resolve([])
-    const testSchema = Schema('test', mockOptions)
+    const testSchema = createSchema('test', mockOptions, { user: mockUser, post: mockPost })
     setTimeout(() => {
-      expect(mockCreatePool).toHaveBeenCalledWith(mockOptions)
-      expect(mockQuery).toHaveBeenCalledWith(`CREATE DATABASE IF NOT EXISTS test; USE test`)
+      expect(mockCreatePool).toHaveBeenCalledWith({
+        ...mockOptions,
+        multipleStatements: true,
+      })
+      expect(mockQuery).toHaveBeenCalledWith('CREATE DATABASE IF NOT EXISTS `test`; USE `test`;')
 
       expect(mockEnd).not.toHaveBeenCalled()
       testSchema.close()
       expect(mockEnd).toHaveBeenCalled()
       done()
     }, 250)
-  })
-
-  it('should add model correctly', () => {
-    const testSchema = Schema<IMySchema>('test', mockOptions)
-    expect(testSchema.models).toEqual({})
-    testSchema.addModel(mockUser)
-    expect(testSchema.models).toEqual({ user: mockUser.keys })
   })
 })
