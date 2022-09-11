@@ -1,4 +1,5 @@
-import { ModelKeys } from '../../'
+import { createModel, ModelKeys } from '../../'
+import { testSchema } from '../schema'
 
 export interface IUser {
   userId?: number
@@ -43,3 +44,7 @@ export const UserKeys: ModelKeys<IUser> = {
     required: true,
   },
 }
+
+const User: typeof createModel<IUser>() = testSchema.addModel<IUser>('user', UserKeys)
+
+const test = User

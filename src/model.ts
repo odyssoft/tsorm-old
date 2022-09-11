@@ -1,10 +1,10 @@
 import { IUser, UserKeys } from './example/models'
 import { Pool } from 'mysql2/promise'
-import { KeyOf, ModelKeys, ModelType } from './'
+import { KeyOf, ModelKeys } from './'
 
-export function createModel<T>(name: string, keys: ModelKeys<T>, connection: Pool): ModelType<T> {
-  return class Model implements ModelType<T> {
-    private data: T
+export function createModel<T>(name: string, keys: ModelKeys<T>, connection: Pool) {
+  return class Model {
+    data: T
     constructor(data: T) {
       this.data = data
     }
@@ -62,33 +62,3 @@ export function createModel<T>(name: string, keys: ModelKeys<T>, connection: Poo
 }
 
 const test = createModel<IUser>('user', UserKeys, {} as Pool)
-
-const variable = new test({
-  userId: 123,
-})
-//stackoverflow.com/questions/40171533/typescript-call-static-method-of-generic-type
-https: class Test<T> {
-  private something: T
-  constructor(something: T) {
-    this.something = something
-  }
-
-  public save(): T {
-    return this.something
-  }
-
-  public static create(): T {
-    return {} as T
-  }
-}
-
-const test2 = new Test<IUser>({
-  email: 'test',
-  userId: 123,
-  forename: 'test',
-  surname: 'test',
-  password: 'test',
-  username: 'test',
-})
-
-test2.save()
