@@ -1,17 +1,20 @@
-import { KeyOf, ModelKeys } from './'
+import { IUser, UserKeys } from './example/models'
+import { Pool } from 'mysql2/promise'
+import { KeyOf, ModelKeys, ModelType } from './'
 
-export function createModel<T>(name: string, keys: ModelKeys<T>) {
-  return class Model {
+export function createModel<T>(name: string, keys: ModelKeys<T>, connection: Pool): ModelType<T> {
+  return class Model implements ModelType<T> {
+    private data: T
     constructor(data: T) {
-      Object.assign(this, data)
+      this.data = data
     }
 
     public save(): T {
       return {} as T
     }
 
-    public static create(): T {
-      return {} as T
+    public static create(data: T): T {
+      return data
     }
     public static createMany(): T[] {
       return [{}] as T[]
@@ -58,56 +61,34 @@ export function createModel<T>(name: string, keys: ModelKeys<T>) {
   }
 }
 
-interface IUser {
-  userId?: number
-  username: string
-  forename: string
-  surname: string
-  email: string
-  password?: string
+const test = createModel<IUser>('user', UserKeys, {} as Pool)
+
+const variable = new test({
+  userId: 123,
+})
+//stackoverflow.com/questions/40171533/typescript-call-static-method-of-generic-type
+https: class Test<T> {
+  private something: T
+  constructor(something: T) {
+    this.something = something
+  }
+
+  public save(): T {
+    return this.something
+  }
+
+  public static create(): T {
+    return {} as T
+  }
 }
 
-const User = createModel<IUser>('user', {
-  userId: {
-    primaryKey: true,
-    autoIncrement: true,
-    type: 'INT',
-  },
-  username: {
-    type: 'VARCHAR',
-    length: 40,
-    required: true,
-    unique: true,
-  },
-  email: {
-    type: 'VARCHAR',
-    length: 310,
-    required: true,
-    unique: true,
-  },
-  forename: {
-    type: 'VARCHAR',
-    length: 255,
-    required: true,
-  },
-  surname: {
-    type: 'VARCHAR',
-    length: 255,
-    required: true,
-  },
-  password: {
-    type: 'VARCHAR',
-    length: 500,
-    required: true,
-  },
+const test2 = new Test<IUser>({
+  email: 'test',
+  userId: 123,
+  forename: 'test',
+  surname: 'test',
+  password: 'test',
+  username: 'test',
 })
 
-const user: IUser = new User({
-  email: 'test@test.com',
-  forename: 'Test',
-  surname: 'User',
-  username: 'testuser',
-  password: 'password',
-}).save()
-
-// User.find()
+test2.save()
