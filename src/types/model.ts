@@ -1,32 +1,26 @@
-import { ColumnOptions, Indexable, KeyOf } from './'
-
-export declare class ModelClass<T> {
-  constructor(data: T)
-}
+import { ColumnOptions, Indexable, KeyOf, OperatorType, Or } from './'
 
 export type ModelKeys<T> = {
   [key in KeyOf<T>]-?: ColumnOptions
 } & Indexable
 
-export type ModelType<T>: void
+export type QueryType<T> =
+  | boolean
+  | number
+  | null
+  | OperatorType<T>
+  | OperatorType<T>[]
+  | StringOverride
 
-// export declare class ModelType<T> {
-//   constructor(data: T)
+export type Select<T> = (options?: SelectOptions<T>) => void
+export interface SelectOptions<T> {
+  $columns?: KeyOf<T>[]
+  $where?: Where<T>
+}
 
-// public save(): T
+export interface StringOverride extends String {}
 
-// static create<T>(data: T): T
-// static createMany<T>(): T[]
-// static deleteMany(): number
-// static deleteOne(): boolean
-// static deleteBy(): boolean
-// static deleteById(): boolean
-// static find(): T | T[]
-// static findBy(key: KeyOf<T>, value: any): T | T[]
-// static findById(): T
-// static findOne(): T
-// static findOneBy(): T
-// static updateMany(): T[]
-// static updateOne(): T
-// static updateOneBy(): T
-// }
+export type Where<T> = Or<WhereOptions<T>> | WhereOptions<T>
+export type WhereOptions<T> = {
+  [Key in KeyOf<T>]?: QueryType<T>
+}

@@ -257,7 +257,7 @@ interface NotLike {
 }
 
 export type Or<T> = {
-  $or: [T, T, ...T[]]
+  $or?: [T, T, ...T[]]
 }
 
 export type OperatorType<T> =

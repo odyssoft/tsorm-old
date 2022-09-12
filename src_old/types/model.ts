@@ -50,7 +50,15 @@ export interface SelectOptions<T> {
 
 interface StringOverride extends String {}
 
+export type QueryType<T> =
+  | boolean
+  | number
+  | null
+  | OperatorType<T>
+  | OperatorType<T>[]
+  | StringOverride
+
 export type Where<T> = Or<WhereOptions<T>> | WhereOptions<T>
 type WhereOptions<T> = {
-  [Key in KeyOf<T>]?: boolean | number | null | OperatorType<T> | OperatorType<T>[] | StringOverride
+  [Key in KeyOf<T>]?: QueryType<T>
 }

@@ -14,6 +14,15 @@ export class Schema {
       ...connection,
       multipleStatements: true,
     })
+
+    this.connection
+      .query(`CREATE DATABASE IF NOT EXISTS \`${name}\`; USE \`${name}\`;`)
+      .then(() => {
+        this.connection.query(this.queries.join(';')).catch((error: any) => {
+          this.connection.end()
+          console.error({ error })
+        })
+      })
   }
 
   addModel<T>(name: string, keys: ModelKeys<T>) {
@@ -23,6 +32,10 @@ export class Schema {
         .join(', ')})`
     )
     return createModel<T>(name, keys, this.connection)
+  }
+
+  close() {
+    this.connection.end()
   }
 }
 
