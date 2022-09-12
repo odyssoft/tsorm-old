@@ -1,25 +1,28 @@
-import { createModel } from 'model'
+import { createModel } from './model'
 import { createPool, Pool } from 'mysql2/promise'
+import { mapKey } from './utils'
 
-import { ConnectionOptions, KeyOf, ModelKeys, Models, ModelsKeys, SchemaType } from './types'
+import { ConnectionOptions, KeyOf, ModelKeys } from './types'
 
-export class Schema<T extends Models<T>> {
-  public models: Models<T> = {} as Models<T>
+export class Schema {
   public name: string
   public connection: Pool
+  private queries: string[] = []
   constructor(name: string, connection: ConnectionOptions) {
     this.name = name
     this.connection = createPool({
       ...connection,
       multipleStatements: true,
     })
-    // this.models = models
   }
 
-  addModel<S>(name: KeyOf<T>, keys: ModelKeys<S>) {
-    this.models[name] = createModel(name, keys, this.connection)
-
-    return this.models[name]
+  addModel<T>(name: string, keys: ModelKeys<T>) {
+    this.queries.push(
+      `CREATE TABLE IF NOT EXISTS ${name} (${Object.keys(keys)
+        .map((key) => mapKey(key, keys[key]))
+        .join(', ')})`
+    )
+    return createModel<T>(name, keys, this.connection)
   }
 }
 

@@ -45,6 +45,12 @@ export const UserKeys: ModelKeys<IUser> = {
   },
 }
 
-const User: typeof createModel<IUser>() = testSchema.addModel<IUser>('user', UserKeys)
+const User = testSchema.addModel<IUser>('user', UserKeys)
 
-const test = User
+const user = new User({
+  email: '',
+  forename: '',
+  surname: '',
+  username: '',
+  password: '',
+}).save()
