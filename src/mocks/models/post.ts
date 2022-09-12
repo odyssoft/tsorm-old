@@ -1,4 +1,4 @@
-import { mockSchema } from '../'
+import { mockSchema } from '../schema'
 
 export interface IPost {
   postId?: number

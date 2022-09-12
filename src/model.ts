@@ -1,5 +1,6 @@
 import { FieldPacket, OkPacket, Pool, RowDataPacket } from 'mysql2/promise'
 import {
+  formatValue,
   getIdKey,
   getInsertKeys,
   getInsertValues,
@@ -20,17 +21,26 @@ export function createModel<T>(name: string, keys: ModelKeys<T>, connection: Poo
     }
 
     static getKeys(): string[] {
-      const keys: string[] = []
-      Object.keys(keys).forEach((key: string) => keys.push(key))
-      return keys
+      const outKeys: string[] = []
+      Object.keys(keys).forEach((key: string) => outKeys.push(key))
+      return outKeys
     }
 
-    public save(): T {
-      return {} as T
+    public save(): Promise<T> {
+      const insertKeys: string[] = getInsertKeys(this.data)
+      const insertValues: string = getInsertValues(this.data, insertKeys)
+      return connection
+        .query<OkPacket>(`INSERT INTO \`${name}\` (${insertKeys.join(', ')}) ${insertValues}`)
+        .then(([{ insertId }]) => {
+          //  @ts-ignore
+          this.data[getIdKey(keys)] = insertId
+          return this.data
+        })
     }
 
     public static insert(data: T | T[]): Promise<[OkPacket, FieldPacket[]]> {
       const insertKeys: string[] = getInsertKeys(data)
+      console.log({ data, insertKeys })
       const insertValues: string = getInsertValues(data, insertKeys)
       return connection.query<OkPacket>(
         `INSERT INTO \`${name}\` (${insertKeys.join(', ')}) ${insertValues}`
@@ -69,10 +79,7 @@ export function createModel<T>(name: string, keys: ModelKeys<T>, connection: Poo
     }
     public static deleteById(id: number): Promise<boolean> {
       //  @ts-ignore
-      return this.delete({ [getIdKey(keys)]: id })
-    }
-    public static deleteMany(query: Where<T>): Promise<number> {
-      return this.delete(query)
+      return this.delete({ [getIdKey(keys)]: id }).then((count) => count === 1)
     }
     public static deleteOne(query: Where<T>): Promise<boolean> {
       return this.delete(query, 1).then((count) => count === 1)
@@ -82,20 +89,24 @@ export function createModel<T>(name: string, keys: ModelKeys<T>, connection: Poo
       return this.delete({ [key]: query }, 1).then((count) => count === 1)
     }
     public static find(query?: SelectOptions<T>): Promise<T[]> {
-      return this.select(query).then(([rows]) => rows as T[])
+      //  @ts-ignore
+      return this.select({ $where: query }).then(([rows]) => rows as T[])
     }
     public static findBy(key: KeyOf<T>, query: QueryType<T>): Promise<T[]> {
       //  @ts-ignore
-      return this.select({ [key]: query })
+      return this.select({ $where: { [key]: query } }).then(([rows]) => rows as T[])
     }
     public static findById(id: number): Promise<T> {
-      return this.select({ [getIdKey(keys)]: id }).then(([rows]) => rows[0] as T)
+      //  @ts-ignore
+      return this.select({ $where: { [getIdKey(keys)]: id } }).then(([rows]) => rows[0] as T)
     }
     public static findOne(query?: SelectOptions<T>): Promise<T> {
-      return this.select(query, 1).then(([rows]) => rows[0] as T)
+      //  @ts-ignore
+      return this.select({ $where: query }, 1).then(([rows]) => rows[0] as T)
     }
     public static findOneBy(key: KeyOf<T>, query: QueryType<T>): Promise<T> {
-      return this.select({ [key]: query }, 1).then(([rows]) => rows[0] as T)
+      //  @ts-ignore
+      return this.select({ $where: { [key]: query } }, 1).then(([rows]) => rows[0] as T)
     }
 
     public static select(
@@ -146,7 +157,7 @@ export function createModel<T>(name: string, keys: ModelKeys<T>, connection: Poo
       return this.upsert(data).then(([{ affectedRows }]) => affectedRows === 1)
     }
 
-    public static upsertManu(data: T[]): Promise<boolean> {
+    public static upsertMany(data: T[]): Promise<boolean> {
       return this.upsert(data).then(([{ affectedRows }]) => affectedRows > 0)
     }
   }

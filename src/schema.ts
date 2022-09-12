@@ -14,14 +14,12 @@ export class Schema {
       ...connection,
       multipleStatements: true,
     })
-
     this.connection
       .query(`CREATE DATABASE IF NOT EXISTS \`${name}\`; USE \`${name}\`;`)
-      .then(() => {
-        this.connection.query(this.queries.join(';')).catch((error: any) => {
-          this.connection.end()
-          console.error({ error })
-        })
+      .then(() => this.connection.query(this.queries.join(';')))
+      .catch((error: any) => {
+        this.connection.end()
+        console.error({ error })
       })
   }
 
