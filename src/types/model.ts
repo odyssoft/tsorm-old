@@ -12,7 +12,6 @@ export type QueryType<T> =
   | OperatorType<T>[]
   | StringOverride
 
-export type Select<T> = (options?: SelectOptions<T>) => void
 export interface SelectOptions<T> {
   $columns?: KeyOf<T>[]
   $where?: Where<T>

@@ -169,7 +169,7 @@ describe('model', () => {
   describe('find', () => {
     it('should call query with correct params and return correct database entry', async () => {
       mockResponse = [mockUser]
-      const users = await User.find({ $where: { userId: { $greaterThanEqual: 1 } } })
+      const users = await User.find({ userId: { $greaterThanEqual: 1 } })
       expect(mockQuery).toHaveBeenCalledWith(`SELECT * FROM \`user\` WHERE userId >= 1`)
       expect(users).toEqual([mockUser])
     })
@@ -196,7 +196,7 @@ describe('model', () => {
   describe('findOne', () => {
     it('should call query with correct params and return correct database entry', async () => {
       mockResponse = [mockUser]
-      const user = await User.findOne({ $where: { userId: { $greaterThanEqual: 1 } } })
+      const user = await User.findOne({ userId: { $greaterThanEqual: 1 } })
       expect(mockQuery).toHaveBeenCalledWith(`SELECT * FROM \`user\` WHERE userId >= 1 LIMIT 1`)
       expect(user).toEqual(mockUser)
     })
@@ -212,7 +212,7 @@ describe('model', () => {
   })
 
   describe('select', () => {
-    it('should call query with correct params and return correct database entry', async () => {
+    it('should call query with correct params and return results with $columns & $with', async () => {
       mockResponse = [{ userId: 1, username: 'test' }]
       const users = await User.select({
         $columns: ['userId', 'username'],
@@ -223,10 +223,26 @@ describe('model', () => {
       )
       expect(users).toEqual([[{ userId: 1, username: 'test' }]])
     })
+
+    it('should call query with correct params and return results with $with', async () => {
+      mockResponse = [{ ...mockUser, userId: 1 }]
+      const users = await User.select({
+        $where: { userId: { $greaterThanEqual: 1 } },
+      })
+      expect(mockQuery).toHaveBeenCalledWith(`SELECT * FROM \`user\` WHERE userId >= 1`)
+      expect(users).toEqual([[{ ...mockUser, userId: 1 }]])
+    })
+
+    it('should call query with correct params and return results without $with', async () => {
+      mockResponse = [{ ...mockUser, userId: 1 }]
+      const users = await User.select()
+      expect(mockQuery).toHaveBeenCalledWith(`SELECT * FROM \`user\``)
+      expect(users).toEqual([[{ ...mockUser, userId: 1 }]])
+    })
   })
 
   describe('truncate', () => {
-    it('should call query with correct params and return true', async () => {
+    it('should call query with correct params and return results', async () => {
       mockResponse = { affectedRows: 1 }
       const result = await User.truncate()
       expect(mockQuery).toHaveBeenCalledWith(`TRUNCATE TABLE \`user\``)

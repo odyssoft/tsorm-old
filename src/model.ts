@@ -88,7 +88,7 @@ export function createModel<T>(name: string, keys: ModelKeys<T>, connection: Poo
       //  @ts-ignore
       return this.delete({ [key]: query }, 1).then((count) => count === 1)
     }
-    public static find(query?: SelectOptions<T>): Promise<T[]> {
+    public static find(query?: Where<T>): Promise<T[]> {
       //  @ts-ignore
       return this.select({ $where: query }).then(([rows]) => rows as T[])
     }
@@ -100,7 +100,7 @@ export function createModel<T>(name: string, keys: ModelKeys<T>, connection: Poo
       //  @ts-ignore
       return this.select({ $where: { [getIdKey(keys)]: id } }).then(([rows]) => rows[0] as T)
     }
-    public static findOne(query?: SelectOptions<T>): Promise<T> {
+    public static findOne(query?: Where<T>): Promise<T> {
       //  @ts-ignore
       return this.select({ $where: query }, 1).then(([rows]) => rows[0] as T)
     }
