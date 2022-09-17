@@ -103,12 +103,13 @@ export function createModel<T>(name: string, keys: ModelKeys<T>, connection: Poo
     public static truncate = (): Promise<[OkPacket, FieldPacket[]]> =>
       connection.query<OkPacket>(`TRUNCATE TABLE \`${name}\``)
 
-    public static update = (data: Partial<T>, query: WhereOptions<T>): Promise<boolean> =>
-      connection
-        .query<OkPacket>(
-          `UPDATE \`${name}\` SET ${parseOptions(data, Keys)} WHERE ${parseOptions(query, Keys)}`
-        )
-        .then(([{ affectedRows }]) => affectedRows > 0)
+    public static update = (
+      data: Partial<T>,
+      query: WhereOptions<T>
+    ): Promise<[OkPacket, FieldPacket[]]> =>
+      connection.query<OkPacket>(
+        `UPDATE \`${name}\` SET ${parseOptions(data, Keys)} WHERE ${parseOptions(query, Keys)}`
+      )
 
     public static upsert = (data: T | T[]): Promise<[OkPacket, FieldPacket[]]> => {
       const insertKeys = getInsertKeys<Partial<T>>(data)

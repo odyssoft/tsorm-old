@@ -97,7 +97,7 @@ describe('model', () => {
       mockResponse = { affectedRows: 4 }
       const result = await User.delete({ userId: { $greaterThanEqual: 1 } })
       expect(mockQuery).toHaveBeenCalledWith(`DELETE FROM \`user\` WHERE userId >= 1`)
-      expect(result).toBe(4)
+      expect(result).toEqual([{ affectedRows: 4 }])
     })
   })
 
@@ -106,7 +106,7 @@ describe('model', () => {
       mockResponse = { affectedRows: 4 }
       const result = await User.deleteBy('userId', { $greaterThanEqual: 1 })
       expect(mockQuery).toHaveBeenCalledWith(`DELETE FROM \`user\` WHERE userId >= 1`)
-      expect(result).toBe(4)
+      expect(result).toEqual([{ affectedRows: 4 }])
     })
   })
 
@@ -252,7 +252,7 @@ describe('model', () => {
       expect(mockQuery).toHaveBeenCalledWith(
         `UPDATE \`user\` SET username = 'testUser' WHERE userId >= 1`
       )
-      expect(result).toBe(true)
+      expect(result).toEqual([{ affectedRows: 1 }])
     })
 
     it('should call query with correct params and return false when affected rows = 0', async () => {
@@ -264,7 +264,7 @@ describe('model', () => {
       expect(mockQuery).toHaveBeenCalledWith(
         `UPDATE \`user\` SET username = 'testUser' WHERE userId >= 1`
       )
-      expect(result).toBe(false)
+      expect(result).toEqual([{ affectedRows: 0 }])
     })
   })
 
