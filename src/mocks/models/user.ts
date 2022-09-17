@@ -7,7 +7,7 @@ export interface IUser {
   password: string
 }
 
-export const User = mockSchema.addModel<IUser>('user', {
+export const User = mockSchema.createModel<IUser>('user', {
   userId: {
     primaryKey: true,
     autoIncrement: true,

@@ -6,7 +6,7 @@ export interface IPost {
   post: string
 }
 
-export const Post = mockSchema.addModel<IPost>('post', {
+export const Post = mockSchema.createModel<IPost>('post', {
   postId: {
     autoIncrement: true,
     primaryKey: true,

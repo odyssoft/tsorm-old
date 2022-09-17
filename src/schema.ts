@@ -23,7 +23,7 @@ export class Schema {
       })
   }
 
-  addModel<T>(name: string, keys: ModelKeys<T>) {
+  createModel<T>(name: string, keys: ModelKeys<T>) {
     this.queries.push(
       `CREATE TABLE IF NOT EXISTS ${name} (${Object.keys(keys)
         .map((key) => mapKey(key, keys[key]))

@@ -27,14 +27,6 @@ const mockUser2 = {
 }
 
 describe('model', () => {
-  describe('getKeys', () => {
-    it('should return default keys without joins', () => {
-      //  @ts-ignore
-      const keys = User.getKeys()
-      expect(keys).toEqual(['userId', 'username', 'email', 'password'])
-    })
-  })
-
   describe('save', () => {
     it('should call query with correct params and return correct database entry', async () => {
       mockResponse = { insertId: 1 }

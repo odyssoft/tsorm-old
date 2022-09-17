@@ -14,19 +14,14 @@ import {
 } from './'
 
 export function createModel<T>(name: string, keys: ModelKeys<T>, connection: Pool) {
+  const Keys: string[] = Object.keys(keys)
   return class Model {
     data: T
     constructor(data: T) {
       this.data = data
     }
 
-    static getKeys(): string[] {
-      const outKeys: string[] = []
-      Object.keys(keys).forEach((key: string) => outKeys.push(key))
-      return outKeys
-    }
-
-    public save(): Promise<T> {
+    public save = (): Promise<T> => {
       const insertKeys: string[] = getInsertKeys(this.data)
       const insertValues: string = getInsertValues(this.data, insertKeys)
       return connection
@@ -38,103 +33,84 @@ export function createModel<T>(name: string, keys: ModelKeys<T>, connection: Poo
         })
     }
 
-    public static insert(data: T | T[]): Promise<[OkPacket, FieldPacket[]]> {
+    public static insert = (data: T | T[]): Promise<[OkPacket, FieldPacket[]]> => {
       const insertKeys: string[] = getInsertKeys(data)
-      console.log({ data, insertKeys })
       const insertValues: string = getInsertValues(data, insertKeys)
       return connection.query<OkPacket>(
         `INSERT INTO \`${name}\` (${insertKeys.join(', ')}) ${insertValues}`
       )
     }
 
-    public static create(data: T): Promise<T> {
-      return this.insert(data).then(([{ insertId }]) => ({
+    public static create = (data: T): Promise<T> =>
+      this.insert(data).then(([{ insertId }]) => ({
         ...data,
         [getIdKey(keys)]: insertId,
       }))
-    }
 
-    public static createMany(data: T[]): Promise<T[]> {
-      return this.insert(data).then(([{ insertId }]) =>
+    public static createMany = (data: T[]): Promise<T[]> =>
+      this.insert(data).then(([{ insertId }]) =>
         data.map((item: T, index: number) => ({
           ...item,
           [getIdKey(keys)]: insertId + index,
         }))
       )
-    }
 
-    public static delete(query: Where<T>, limit?: number): Promise<number> {
-      return connection
-        .query<OkPacket>(
-          `DELETE FROM \`${name}\` WHERE ${parseOptions(query, this.getKeys())}${
-            limit ? ` LIMIT ${limit}` : ''
-          }`
-        )
-        .then(([{ affectedRows }]) => affectedRows)
-    }
+    public static delete = (query: Where<T>, limit?: number): Promise<[OkPacket, FieldPacket[]]> =>
+      connection.query<OkPacket>(
+        `DELETE FROM \`${name}\` WHERE ${parseOptions(query, Keys)}${
+          limit ? ` LIMIT ${limit}` : ''
+        }`
+      )
 
-    public static deleteBy(key: KeyOf<T>, query: QueryType<T>): Promise<number> {
+    public static deleteBy = (key: KeyOf<T>, query: QueryType<T>): Promise<number> =>
       //  @ts-ignore
-      return this.delete({ [key]: query })
-    }
-    public static deleteById(id: number): Promise<boolean> {
+      this.delete({ [key]: query })
+    public static deleteById = (id: number): Promise<boolean> =>
       //  @ts-ignore
-      return this.delete({ [getIdKey(keys)]: id }).then((count) => count === 1)
-    }
-    public static deleteOne(query: Where<T>): Promise<boolean> {
-      return this.delete(query, 1).then((count) => count === 1)
-    }
-    public static deleteOneBy(key: KeyOf<T>, query: QueryType<T>): Promise<boolean> {
+      this.delete({ [getIdKey(keys)]: id }).then(([{ affectedRows }]) => affectedRows === 1)
+    public static deleteOne = (query: Where<T>): Promise<boolean> =>
+      this.delete(query, 1).then(([{ affectedRows }]) => affectedRows === 1)
+    public static deleteOneBy = (key: KeyOf<T>, query: QueryType<T>): Promise<boolean> =>
       //  @ts-ignore
-      return this.delete({ [key]: query }, 1).then((count) => count === 1)
-    }
-    public static find(query?: Where<T>): Promise<T[]> {
-      //  @ts-ignore
-      return this.select({ $where: query }).then(([rows]) => rows as T[])
-    }
-    public static findBy(key: KeyOf<T>, query: QueryType<T>): Promise<T[]> {
-      //  @ts-ignore
-      return this.select({ $where: { [key]: query } }).then(([rows]) => rows as T[])
-    }
-    public static findById(id: number): Promise<T> {
-      //  @ts-ignore
-      return this.select({ $where: { [getIdKey(keys)]: id } }).then(([rows]) => rows[0] as T)
-    }
-    public static findOne(query?: Where<T>): Promise<T> {
-      //  @ts-ignore
-      return this.select({ $where: query }, 1).then(([rows]) => rows[0] as T)
-    }
-    public static findOneBy(key: KeyOf<T>, query: QueryType<T>): Promise<T> {
-      //  @ts-ignore
-      return this.select({ $where: { [key]: query } }, 1).then(([rows]) => rows[0] as T)
-    }
+      this.delete({ [key]: query }, 1).then(([{ affectedRows }]) => affectedRows === 1)
 
-    public static select(
+    public static find = (query?: Where<T>): Promise<T[]> =>
+      //  @ts-ignore
+      this.select({ $where: query }).then(([rows]) => rows as T[])
+    public static findBy = (key: KeyOf<T>, query: QueryType<T>): Promise<T[]> =>
+      //  @ts-ignore
+      this.select({ $where: { [key]: query } }).then(([rows]) => rows as T[])
+    public static findById = (id: number): Promise<T> =>
+      //  @ts-ignore
+      this.select({ $where: { [getIdKey(keys)]: id } }).then(([rows]) => rows[0] as T)
+    public static findOne = (query?: Where<T>): Promise<T> =>
+      //  @ts-ignore
+      this.select({ $where: query }, 1).then(([rows]) => rows[0] as T)
+    public static findOneBy = (key: KeyOf<T>, query: QueryType<T>): Promise<T> =>
+      //  @ts-ignore
+      this.select({ $where: { [key]: query } }, 1).then(([rows]) => rows[0] as T)
+
+    public static select = (
       query?: SelectOptions<T>,
       limit?: number
-    ): Promise<[RowDataPacket[], FieldPacket[]]> {
+    ): Promise<[RowDataPacket[], FieldPacket[]]> => {
       const sql: string[] = [`SELECT ${query?.$columns?.join(', ') || '*'} FROM \`${name}\``]
-      query?.$where && sql.push(`WHERE ${parseOptions(query.$where, this.getKeys())}`)
+      query?.$where && sql.push(`WHERE ${parseOptions(query.$where, Keys)}`)
       limit && sql.push(`LIMIT ${limit}`)
       return connection.query<RowDataPacket[]>(sql.join(' '))
     }
 
-    public static truncate(): Promise<[OkPacket, FieldPacket[]]> {
-      return connection.query<OkPacket>(`TRUNCATE TABLE \`${name}\``)
-    }
+    public static truncate = (): Promise<[OkPacket, FieldPacket[]]> =>
+      connection.query<OkPacket>(`TRUNCATE TABLE \`${name}\``)
 
-    public static update(data: Partial<T>, query: WhereOptions<T>): Promise<boolean> {
-      return connection
+    public static update = (data: Partial<T>, query: WhereOptions<T>): Promise<boolean> =>
+      connection
         .query<OkPacket>(
-          `UPDATE \`${name}\` SET ${parseOptions(data, this.getKeys())} WHERE ${parseOptions(
-            query,
-            this.getKeys()
-          )}`
+          `UPDATE \`${name}\` SET ${parseOptions(data, Keys)} WHERE ${parseOptions(query, Keys)}`
         )
         .then(([{ affectedRows }]) => affectedRows > 0)
-    }
 
-    public static upsert(data: T | T[]): Promise<[OkPacket, FieldPacket[]]> {
+    public static upsert = (data: T | T[]): Promise<[OkPacket, FieldPacket[]]> => {
       const insertKeys = getInsertKeys<Partial<T>>(data)
       const insertValues = getInsertValues<Partial<T>>(data, insertKeys)
       const sql: string[] = [`INSERT INTO \`${name}\` (${insertKeys.join(', ')}) ${insertValues}`]
@@ -153,12 +129,10 @@ export function createModel<T>(name: string, keys: ModelKeys<T>, connection: Poo
       return connection.query<OkPacket>(sql.join(' '))
     }
 
-    public static upsertOne(data: T): Promise<boolean> {
-      return this.upsert(data).then(([{ affectedRows }]) => affectedRows === 1)
-    }
+    public static upsertOne = (data: T): Promise<boolean> =>
+      this.upsert(data).then(([{ affectedRows }]) => affectedRows === 1)
 
-    public static upsertMany(data: T[]): Promise<boolean> {
-      return this.upsert(data).then(([{ affectedRows }]) => affectedRows > 0)
-    }
+    public static upsertMany = (data: T[]): Promise<boolean> =>
+      this.upsert(data).then(([{ affectedRows }]) => affectedRows > 0)
   }
 }

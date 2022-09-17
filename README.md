@@ -10,63 +10,58 @@ npm install @odyssoft/tsorm
 
 ## Usage
 
-- Create "database" and "database/models" folders.
+- Create Schema file
 - Create and export the models required for your project.
+
+### Database/schema.ts
+
+```typescript
+import { Schema } from '@odyssoft/tsorm'
+
+export const mySchema = new Schema('my_schema', {
+  host: 'localhost',
+  password: 'password',
+  port: 3306,
+  user: 'root',
+})
+```
 
 ### Database/models/user.ts
 
 ```typescript
-import { createModel } from '@odyssoft/tsorm'
+import mySchema from '../schema'
 
 export interface IUser {
-  userId?: string // Primary key, not required for inserts but will be attached to results
-  name: string //  Will be required for both insert and result
-  age: number // Will be required for both insert and result
+  userId?: number
+  username: string
+  email: string
+  password: string
 }
 
-export const User = createModel<IUser>('user', {
+export const User = mockSchema.createModel<IUser>('user', {
   userId: {
-    type: 'INT',
-    autoIncrement: true,
     primaryKey: true,
-    required: true,
-  },
-  age: {
-    required: true,
+    autoIncrement: true,
     type: 'INT',
   },
-  name: {
-    required: true,
+  username: {
     type: 'VARCHAR',
-    length: 255,
+    length: 40,
+    required: true,
+    unique: true,
+  },
+  email: {
+    type: 'VARCHAR',
+    length: 310,
+    required: true,
+    unique: true,
+  },
+  password: {
+    type: 'VARCHAR',
+    length: 500,
+    required: true,
   },
 })
-```
-
-### Database/index.ts
-
-```typescript
-import { createSchema } from '@odyssoft/tsorm'
-import { IUser, user } from './models'
-
-interface IMySchema {
-  user: IUser
-}
-
-export const MySchema = createSchema<IMySchema>(
-  'my_schema',
-  {
-    host: 'localhost',
-    port: 3306,
-    user: 'YOUR_DATABASE_USER',
-    password: 'YOUR_DATABASE_PASSWORD',
-  },
-  {
-    user,
-  }
-)
-
-export const { user: User } = MySchema.models
 ```
 
 ### routes/user.ts
@@ -78,20 +73,46 @@ import { User } from '../database'
 const router = Router()
 
 const UserRoutes = () => {
-  router.get('/:id', ({ params: { id } }: Request, res: Response) => {
-    User.select({ $where: { userId: id } })
-      .then(([result]) => res.json({ result }))
+  router.get('/:id', ({ params: { id } }: Request, res: Response) =>
+    User.find({ $where: { userId: id } })
+      .then((user) => res.json(user))
       .catch((error: any) => res.json({ error }))
-  })
+  )
 
-  router.post('/', ({ body: { name, email } }: Request, res: Response) => {
-    User.insert({ name, email })
-      .then(([result]) => res.json({ result }))
+  router.post('/', ({ body: { name, email, password } }: Request, res: Response) =>
+    User.create({ name, email, password: encryptPassword(password) })
+      .then((user) => res.json(user))
       .catch((error: any) => res.json({ error }))
-  })
+  )
 
   return router
 }
 
 export default UserRoutes
+```
+
+### Query examples
+
+```typescript
+import { User } from '../database/models/user'
+
+User.insert()
+User.create()
+User.createMany()
+User.delete()
+User.deleteBy()
+User.deleteById()
+User.deleteOne()
+User.deleteOneBy()
+User.find()
+User.findBy()
+User.findById()
+User.findOne()
+User.findOneBy()
+User.select()
+User.truncate()
+User.update()
+User.upsert()
+User.upsertOne()
+User.upsertMany()
 ```
