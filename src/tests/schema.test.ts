@@ -1,8 +1,6 @@
 import { PoolOptions } from 'mysql2/typings/mysql'
-import { IMySchema } from '../mocks/schema'
-import { createSchema } from '../'
+import { Schema } from '../'
 import { ConnectionOptions } from '../types'
-import { mockPost, mockUser } from '../mocks/models'
 
 const mockEnd = jest.fn()
 let mockPromise = Promise.resolve([])
@@ -24,22 +22,19 @@ const mockOptions: ConnectionOptions = {
   user: 'user',
 }
 
-describe('createSchema', () => {
-  it('should call createPool with correct params', (done) => {
-    createSchema<IMySchema>('test', mockOptions, { user: mockUser, post: mockPost })
-    setTimeout(() => {
-      expect(mockCreatePool).toHaveBeenCalledWith({
-        ...mockOptions,
-        multipleStatements: true,
-      })
-      expect(mockQuery).toHaveBeenCalledWith('CREATE DATABASE IF NOT EXISTS `test`; USE `test`;')
-      done()
-    }, 250)
+describe('Schema', () => {
+  it('should call createPool with correct params', () => {
+    new Schema('test', mockOptions)
+    expect(mockCreatePool).toHaveBeenCalledWith({
+      ...mockOptions,
+      multipleStatements: true,
+    })
+    expect(mockQuery).toHaveBeenCalledWith('CREATE DATABASE IF NOT EXISTS `test`; USE `test`;')
   })
 
   it('should call end when create query fails', (done) => {
     mockPromise = Promise.reject(new Error('Something went wrong'))
-    createSchema<IMySchema>('test', mockOptions, { user: mockUser, post: mockPost })
+    new Schema('test', mockOptions)
     setTimeout(() => {
       expect(mockCreatePool).toHaveBeenCalledWith({
         ...mockOptions,
@@ -51,21 +46,16 @@ describe('createSchema', () => {
     }, 250)
   })
 
-  it('should call end when user closes schema', (done) => {
+  it('should call end when user closes schema', () => {
     jest.clearAllMocks()
     mockPromise = Promise.resolve([])
-    const testSchema = createSchema('test', mockOptions, { user: mockUser, post: mockPost })
-    setTimeout(() => {
-      expect(mockCreatePool).toHaveBeenCalledWith({
-        ...mockOptions,
-        multipleStatements: true,
-      })
-      expect(mockQuery).toHaveBeenCalledWith('CREATE DATABASE IF NOT EXISTS `test`; USE `test`;')
-
-      expect(mockEnd).not.toHaveBeenCalled()
-      testSchema.close()
-      expect(mockEnd).toHaveBeenCalled()
-      done()
-    }, 250)
+    const testSchema = new Schema('test', mockOptions)
+    expect(mockCreatePool).toHaveBeenCalledWith({
+      ...mockOptions,
+      multipleStatements: true,
+    })
+    expect(mockQuery).toHaveBeenCalledWith('CREATE DATABASE IF NOT EXISTS `test`; USE `test`;')
+    testSchema.close()
+    expect(mockEnd).toHaveBeenCalled()
   })
 })

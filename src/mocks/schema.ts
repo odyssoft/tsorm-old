@@ -1,25 +1,10 @@
-import { createSchema } from '../'
-import { IMockPost, IMockUser, mockPost, mockUser } from './models'
+import { ConnectionOptions, Schema } from '../'
 
-export interface IMySchema {
-  post: IMockPost
-  user: IMockUser
+const options: ConnectionOptions = {
+  host: 'localhost',
+  password: 'password',
+  port: 3306,
+  user: 'root',
 }
 
-const MySchema = createSchema<IMySchema>(
-  'my_schema',
-  {
-    host: '',
-    port: 1337,
-    user: '',
-    password: '',
-  },
-  {
-    post: mockPost,
-    user: mockUser,
-  }
-)
-
-export const { post: Post, user: User } = MySchema.models
-
-export default MySchema
+export const mockSchema = new Schema('mock', options)

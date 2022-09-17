@@ -1,5 +1,5 @@
 import { Pool, PoolOptions } from 'mysql2/promise'
-import { KeyOf, ModelType } from './'
+import { KeyOf, ModelKeys } from './'
 
 export interface ConnectionOptions extends PoolOptions {
   host: string
@@ -8,59 +8,19 @@ export interface ConnectionOptions extends PoolOptions {
   user: string
 }
 
-export type Models<T> = {
-  [K in keyof T]: ModelType<T[K]>
+export type ModelsKeys<T> = {
+  [K in keyof T]: ModelKeys<T[K]>
 }
+// export type Models<T> = {
+//   [K in keyof T]: ModelType<T[K]>
+// }
 
 export type SchemaType<T> = {
   connection: Pool
-  models: Models<T>
+  // models: Models<T>
   name: string
 
   close: () => void
-}
-
-export interface ColumnOptions {
-  autoIncrement?: boolean
-  default?: any
-  length?: number
-  primaryKey?: boolean
-  required?: boolean
-  type:
-    | 'CHAR'
-    | 'VARCHAR'
-    | 'BINARY'
-    | 'VARBINARY'
-    | 'TINYBLOB'
-    | 'TINYTEXT'
-    | 'TEXT'
-    | 'BLOB'
-    | 'MEDIUMTEXT'
-    | 'MEDIUMBLOB'
-    | 'LONGTEXT'
-    | 'LONGBLOB'
-    | 'ENUM'
-    | 'SET'
-    | 'BIT'
-    | 'TINYINT'
-    | 'BOOL'
-    | 'BOOLEAN'
-    | 'SMALLINT'
-    | 'MEDIUMINT'
-    | 'INT'
-    | 'INTEGER'
-    | 'BIGINT'
-    | 'FLOAT'
-    | 'FLOAT'
-    | 'DOUBLE'
-    | 'DOUBLE PRECISION'
-    | 'DECIMAL'
-    | 'DEC'
-    | 'DATE'
-    | 'DATETIME'
-    | 'TIMESTAMP'
-    | 'TIME'
-    | 'YEAR'
 }
 
 export type BetweenType<T = any> = {

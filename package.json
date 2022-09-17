@@ -1,12 +1,13 @@
 {
   "name": "@odyssoft/tsorm",
-  "version": "1.0.2",
+  "version": "1.0.3",
   "description": "TypeScript ORM for MySQL",
   "main": "lib/index.js",
   "scripts": {
     "build": "tsc",
     "test": "jest",
-    "coverage": "jest --coverage"
+    "coverage": "jest --coverage",
+    "start": "ts-node ./src/test.ts"
   },
   "repository": {
     "type": "git",

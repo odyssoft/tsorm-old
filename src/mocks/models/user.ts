@@ -1,25 +1,33 @@
-import { createModel } from '../../'
+import { mockSchema } from '../schema'
 
-export interface IMockUser {
+export interface IUser {
   userId?: number
-  name: string
-  age: number
+  username: string
+  email: string
+  password: string
 }
 
-export const mockUser = createModel<IMockUser>('user', {
+export const User = mockSchema.createModel<IUser>('user', {
   userId: {
-    autoIncrement: true,
     primaryKey: true,
-    required: true,
+    autoIncrement: true,
     type: 'INT',
   },
-  name: {
-    required: true,
+  username: {
     type: 'VARCHAR',
-    length: 255,
-  },
-  age: {
+    length: 40,
     required: true,
-    type: 'INT',
+    unique: true,
+  },
+  email: {
+    type: 'VARCHAR',
+    length: 310,
+    required: true,
+    unique: true,
+  },
+  password: {
+    type: 'VARCHAR',
+    length: 500,
+    required: true,
   },
 })

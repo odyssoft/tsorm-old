@@ -1,53 +1,88 @@
-import { createPool } from 'mysql2/promise'
-
-import { ConnectionOptions, Models, SchemaType } from './types'
+import { createModel } from './model'
+import { createPool, Pool } from 'mysql2/promise'
 import { mapKey } from './utils'
 
-export function createSchema<T>(
-  name: string,
-  options: ConnectionOptions,
-  models: Models<T>
-): SchemaType<T> {
-  const connection = createPool({
-    ...options,
-    multipleStatements: true,
-  })
+import { ConnectionOptions, KeyOf, ModelKeys } from './types'
 
-  const queries: string[] = []
-
-  connection
-    .query(`CREATE DATABASE IF NOT EXISTS \`${name}\`; USE \`${name}\`;`)
-    .then(() => createTables())
-    .catch((error: any) => {
-      connection.end()
-      console.error({ error })
+export class Schema {
+  public name: string
+  public connection: Pool
+  private queries: string[] = []
+  constructor(name: string, connection: ConnectionOptions) {
+    this.name = name
+    this.connection = createPool({
+      ...connection,
+      multipleStatements: true,
     })
+    this.connection
+      .query(`CREATE DATABASE IF NOT EXISTS \`${name}\`; USE \`${name}\`;`)
+      .then(() => this.connection.query(this.queries.join(';')))
+      .catch((error: any) => {
+        this.connection.end()
+        console.error({ error })
+      })
+  }
 
-  for (const m in models) {
-    models[m].connection = connection
-    queries.push(
-      `CREATE TABLE IF NOT EXISTS ${models[m].name} (${Object.keys(models[m].keys)
-        .map((key) => mapKey(key, models[m].keys[key]))
+  createModel<T>(name: string, keys: ModelKeys<T>) {
+    this.queries.push(
+      `CREATE TABLE IF NOT EXISTS ${name} (${Object.keys(keys)
+        .map((key) => mapKey(key, keys[key]))
         .join(', ')})`
     )
+    return createModel<T>(name, keys, this.connection)
   }
 
-  const createTables = () => {
-    connection.query(queries.join(';')).catch((error: any) => {
-      connection.end()
-      console.error({ error })
-    })
-  }
-
-  return {
-    connection,
-    models,
-    name,
-
-    close() {
-      connection.end()
-    },
+  close() {
+    this.connection.end()
   }
 }
 
-export default createSchema
+// export function createSchema<T>(
+//   name: string,
+//   options: ConnectionOptions,
+//   models: ModelsKeys<T>
+// ): SchemaType<T> {
+//   const connection = createPool({
+//     ...options,
+//     multipleStatements: true,
+//   })
+//   const queries: string[] = []
+//   connection
+//     .query(`CREATE DATABASE IF NOT EXISTS \`${name}\`; USE \`${name}\`;`)
+//     .then(() => createTables())
+//     .catch((error: any) => {
+//       connection.end()
+//       console.error({ error })
+//     })
+
+//   const createModels = () => {
+//     const model: Models<T> = {} as Models<T>
+//     for (const m in models) {
+//       model[m] = createModel(m.toString(), models[m], connection)
+//       queries.push(
+//         `CREATE TABLE IF NOT EXISTS ${models[m].name} (${Object.keys(models[m].keys)
+//           .map((key) => mapKey(key, models[m].keys[key]))
+//           .join(', ')})`
+//       )
+//     }
+
+//     return models
+//   }
+
+//   const createTables = () => {
+//     connection.query(queries.join(';')).catch((error: any) => {
+//       connection.end()
+//       console.error({ error })
+//     })
+//   }
+
+//   return {
+//     connection,
+//     models: createModels(),
+//     name,
+
+//     close() {
+//       connection.end()
+//     },
+//   }
+// }

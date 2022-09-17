@@ -1,6 +1,7 @@
 import { ModelKeys } from '../types'
 import {
   formatValue,
+  getIdKey,
   getInsertKeys,
   getInsertValues,
   mapKey,
@@ -67,6 +68,59 @@ describe('utils', () => {
       expect(result).toBe('test')
     })
   })
+
+  describe('getIdKey', () => {
+    it('should return id when id is in keys', () => {
+      const result = getIdKey<IMock>(mockKeys)
+      expect(result).toBe('id')
+    })
+
+    it('should return key beginning with id and key is primary', () => {
+      const result = getIdKey<{ idkey: number; name: string }>({
+        idkey: {
+          type: 'INT',
+          primaryKey: true,
+        },
+        name: {
+          type: 'VARCHAR',
+          length: 255,
+          required: true,
+        },
+      })
+      expect(result).toBe('idkey')
+    })
+
+    it('should return key ending with id and key is primary', () => {
+      const result = getIdKey<{ keyid: number; name: string }>({
+        keyid: {
+          type: 'INT',
+          primaryKey: true,
+        },
+        name: {
+          type: 'VARCHAR',
+          length: 255,
+          required: true,
+        },
+      })
+      expect(result).toBe('keyid')
+    })
+
+    it('should return key without id in the name', () => {
+      const result = getIdKey<{ mainkey: number; name: string }>({
+        mainkey: {
+          type: 'INT',
+          primaryKey: true,
+        },
+        name: {
+          type: 'VARCHAR',
+          length: 255,
+          required: true,
+        },
+      })
+      expect(result).toBe('mainkey')
+    })
+  })
+
   describe('getInsertKeys', () => {
     it('should return all keys from object', () => {
       const result = getInsertKeys({ name: '', id: '', age: '' })

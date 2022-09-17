@@ -1,12 +1,12 @@
-import { createModel } from '../../'
+import { mockSchema } from '../schema'
 
-export interface IMockPost {
+export interface IPost {
   postId?: number
   userId: number
   post: string
 }
 
-export const mockPost = createModel<IMockPost>('post', {
+export const Post = mockSchema.createModel<IPost>('post', {
   postId: {
     autoIncrement: true,
     primaryKey: true,

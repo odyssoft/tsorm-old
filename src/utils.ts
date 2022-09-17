@@ -8,6 +8,7 @@ import {
   LessThanEqualType,
   LessThanType,
   LikeType,
+  ModelKeys,
 } from './types'
 
 export const formatValue = (
@@ -30,17 +31,37 @@ export const formatValue = (
   return output
 }
 
+export const getIdKey = <T>(keys: ModelKeys<T>) => {
+  let id: string = ''
+  for (const key in keys) {
+    if (key === 'id' || key.startsWith('id') || key.endsWith('id')) {
+      if (keys[key].primaryKey) {
+        id = key
+        break
+      }
+    }
+    if (keys[key].primaryKey) {
+      id = key
+      break
+    }
+  }
+
+  return id
+}
+
 export const getInsertKeys = <T>(data: T | T[]): string[] => {
   const keys: string[] = []
   Array.isArray(data)
     ? data.forEach((d) => {
+        //  @ts-ignore
         Object.keys(d).forEach((key) => {
           if (!keys.includes(key)) {
             keys.push(key)
           }
         })
       })
-    : keys.push(...Object.keys(data))
+    : //  @ts-ignore
+      keys.push(...Object.keys(data))
 
   return keys
 }
@@ -107,5 +128,6 @@ export const parseValue = (key: string, value: any, keys?: string[]): string => 
   }
   const Operator: any = operator(key, keys)
   const [id] = Object.keys(value)
+  console.log({ id })
   return Operator[id](value[id])
 }
