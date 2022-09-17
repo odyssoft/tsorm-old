@@ -1,4 +1,2 @@
-export * from './model'
-export * from './schema'
+export { Schema } from './schema'
 export * from './types'
-export * from './utils'
