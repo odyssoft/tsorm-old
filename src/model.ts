@@ -1,17 +1,6 @@
 import { FieldPacket, OkPacket, Pool, RowDataPacket } from 'mysql2/promise'
-import {
-  formatValue,
-  getIdKey,
-  getInsertKeys,
-  getInsertValues,
-  KeyOf,
-  ModelKeys,
-  parseOptions,
-  QueryType,
-  SelectOptions,
-  Where,
-  WhereOptions,
-} from './'
+import { KeyOf, ModelKeys, QueryType, SelectOptions, Where, WhereOptions } from './'
+import { formatValue, getIdKey, getInsertKeys, getInsertValues, parseOptions } from './utils'
 
 export function createModel<T>(name: string, keys: ModelKeys<T>, connection: Pool) {
   const Keys: string[] = Object.keys(keys)
