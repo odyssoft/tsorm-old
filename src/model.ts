@@ -1,9 +1,49 @@
 import { FieldPacket, OkPacket, Pool, RowDataPacket } from 'mysql2/promise'
-import { KeyOf, ModelKeys, QueryType, SelectOptions, Where, WhereOptions } from './'
+import {
+  Alias,
+  Join,
+  JoinObject,
+  JoinOptions,
+  KeyOf,
+  ModelKeys,
+  QueryType,
+  SelectOptions,
+  Where,
+  WhereOptions,
+} from './'
 import { formatValue, getIdKey, getInsertKeys, getInsertValues, parseOptions } from './utils'
 
 export function createModel<T>(name: string, keys: ModelKeys<T>, connection: Pool) {
   const Keys: string[] = Object.keys(keys)
+
+  class AliasModel<A extends string> {
+    alias: A
+    keys: ModelKeys<Alias<T, A>> = keys as ModelKeys<Alias<T, A>>
+    joins: JoinObject[] = []
+
+    constructor(alias: A) {
+      this.alias = alias
+    }
+
+    join = <S, AA extends string>(
+      model: {
+        [key: string]: any
+        alias: AA
+        keys: ModelKeys<Alias<S, AA>>
+      },
+      join: Join,
+      on: JoinOptions<Alias<T, A> & Alias<S, AA>>
+    ) => {
+      this.joins.push({
+        alias: model.alias,
+        join,
+        on,
+      })
+
+      return <{}>(<any>this)
+    }
+  }
+
   return class Model {
     data: T
     constructor(data: T) {
@@ -21,6 +61,8 @@ export function createModel<T>(name: string, keys: ModelKeys<T>, connection: Poo
           return this.data
         })
     }
+
+    public static as = <A extends string>(alias: A) => new AliasModel<A>(alias)
 
     public static insert = (data: T | T[]): Promise<[OkPacket, FieldPacket[]]> => {
       const insertKeys: string[] = getInsertKeys(data)
