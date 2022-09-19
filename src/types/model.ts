@@ -7,7 +7,11 @@ export type Alias<T, A extends string> = {
 export type AliasModel<T> = {
   [key: string]: any
   keys: ModelKeys<T>
-  join: <S, A extends string>(alias: AliasModel<Alias<S, A>>) => AliasModel<T & Alias<S, A>>
+  join: <S, A extends string>(
+    alias: AliasModel<Alias<S, A>>,
+    join: Join,
+    on: JoinOptions<T & Alias<S, A>>
+  ) => AliasModel<T & Alias<S, A>>
 }
 /*
 

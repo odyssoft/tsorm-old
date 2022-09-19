@@ -36,7 +36,7 @@ export function createModel<T>(name: string, keys: ModelKeys<T>, connection: Poo
     }
 
     public static as = <A extends string>(alias: A) =>
-      aliasModel<T, A>(alias, name, keys as ModelKeys<Alias<T, A>>, connection)
+      aliasModel<Alias<T, A>>(alias, name, keys as ModelKeys<Alias<T, A>>, connection)
 
     public static insert = (data: T | T[]): Promise<[OkPacket, FieldPacket[]]> => {
       const insertKeys: string[] = getInsertKeys(data)
@@ -143,8 +143,8 @@ export function createModel<T>(name: string, keys: ModelKeys<T>, connection: Poo
   }
 }
 
-export function aliasModel<T, A extends string>(
-  alias: A,
+export function aliasModel<T>(
+  alias: string,
   name: string,
   keys: ModelKeys<T>,
   connection: Pool
@@ -152,11 +152,13 @@ export function aliasModel<T, A extends string>(
   return {
     joins: [],
     keys,
-    join<S, A extends string>(alias: AliasModel<Alias<S, A>>): AliasModel<T & Alias<S, A>> {
-      this.joins.push()
-      return <AliasModel<T & Alias<S, A>>>(<any>{
-        ...this,
-      })
+    join<S, AA extends string>(
+      alias: AliasModel<Alias<S, AA>>,
+      join: Join,
+      on: JoinOptions<T & Alias<S, AA>>
+    ): AliasModel<T & Alias<S, AA>> {
+      this.joins.push({})
+      return <AliasModel<T & Alias<S, AA>>>(<any>this)
     },
   }
 }
