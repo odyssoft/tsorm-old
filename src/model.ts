@@ -1,6 +1,7 @@
 import { FieldPacket, OkPacket, Pool, RowDataPacket } from 'mysql2/promise'
 import {
   Alias,
+  AliasModel,
   Join,
   JoinObject,
   JoinOptions,
@@ -15,34 +16,6 @@ import { formatValue, getIdKey, getInsertKeys, getInsertValues, parseOptions } f
 
 export function createModel<T>(name: string, keys: ModelKeys<T>, connection: Pool) {
   const Keys: string[] = Object.keys(keys)
-
-  class AliasModel<A extends string> {
-    alias: A
-    keys: ModelKeys<Alias<T, A>> = keys as ModelKeys<Alias<T, A>>
-    joins: JoinObject[] = []
-
-    constructor(alias: A) {
-      this.alias = alias
-    }
-
-    join = <S, AA extends string>(
-      model: {
-        [key: string]: any
-        alias: AA
-        keys: ModelKeys<Alias<S, AA>>
-      },
-      join: Join,
-      on: JoinOptions<Alias<T, A> & Alias<S, AA>>
-    ) => {
-      this.joins.push({
-        alias: model.alias,
-        join,
-        on,
-      })
-
-      return <{}>(<any>this)
-    }
-  }
 
   return class Model {
     data: T
@@ -62,7 +35,8 @@ export function createModel<T>(name: string, keys: ModelKeys<T>, connection: Poo
         })
     }
 
-    public static as = <A extends string>(alias: A) => new AliasModel<A>(alias)
+    public static as = <A extends string>(alias: A) =>
+      aliasModel<T, A>(alias, name, keys as ModelKeys<Alias<T, A>>, connection)
 
     public static insert = (data: T | T[]): Promise<[OkPacket, FieldPacket[]]> => {
       const insertKeys: string[] = getInsertKeys(data)
@@ -168,3 +142,49 @@ export function createModel<T>(name: string, keys: ModelKeys<T>, connection: Poo
       this.upsert(data).then(([{ affectedRows }]) => affectedRows > 0)
   }
 }
+
+export function aliasModel<T, A extends string>(
+  alias: A,
+  name: string,
+  keys: ModelKeys<T>,
+  connection: Pool
+): AliasModel<T> {
+  return {
+    joins: [],
+    keys,
+    join<S, A extends string>(alias: AliasModel<Alias<S, A>>): AliasModel<T & Alias<S, A>> {
+      this.joins.push()
+      return <AliasModel<T & Alias<S, A>>>(<any>{
+        ...this,
+      })
+    },
+  }
+}
+/*
+as<A extends string>(alias: A): AliasModelType<T, A> {
+  this.alias = alias
+  return <AliasModelType<T, A>>(<any>{
+    ...this,
+    join<S, AA extends string>(
+      model: AliasModelType<S, AA>,
+      options: JoinOptions<AliasModelKeys<T, A> & AliasModelKeys<S, AA>>
+    ) {
+      return join<AliasModelType<T, A>, AliasModelKeys<T, A>, S, AA>(
+        <ModelType<AliasModelType<T, A>>>(<any>this),
+        model,
+        options
+      )
+    },
+  })
+},
+
+function join<T, K, S, A extends string>(
+  original: ModelType<T>,
+  model: AliasModelType<S, A>,
+  options: JoinOptions<K & AliasModelKeys<S, A>>
+): ModelType<K & AliasModelKeys<S, A>> {
+  original.joins.push({ model, options })
+  return <ModelType<K & AliasModelKeys<S, A>>>(<any>original)
+}
+
+*/
