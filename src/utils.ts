@@ -110,14 +110,16 @@ export const operator = <T>(key: string, keys?: string[]) => ({
   $notLike: (input: LikeType) => `${key} NOT LIKE ${formatValue(input)}`,
 })
 
-export const parseOptions = (options: any, keys?: string[]): string =>
-  `${Object.keys(options as any)
+export const parseOptions = (options: any, keys?: string[]): string => {
+  console.log({ keys })
+  return `${Object.keys(options as any)
     .map((key) =>
       key === '$or'
         ? `(${options[key].map((value: any) => parseOptions(value, keys)).join(' OR ')})`
         : parseValue(key, options[key], keys)
     )
     .join(' AND ')}`
+}
 
 export const parseValue = (key: string, value: any, keys?: string[]): string => {
   if (value === null) {

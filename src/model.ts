@@ -36,7 +36,7 @@ export function createModel<T>(name: string, keys: ModelKeys<T>, connection: Poo
     }
 
     public static as = <A extends string>(alias: A) =>
-      aliasModel<Alias<T, A>>(alias, name, keys as ModelKeys<Alias<T, A>>, connection)
+      aliasModel<Alias<T, A>>(alias, name, (<unknown>keys) as ModelKeys<Alias<T, A>>, connection)
 
     public static insert = (data: T | T[]): Promise<[OkPacket, FieldPacket[]]> => {
       const insertKeys: string[] = getInsertKeys(data)
@@ -150,43 +150,32 @@ export function aliasModel<T>(
   connection: Pool
 ): AliasModel<T> {
   return {
-    joins: [],
+    alias,
     keys,
+    name,
+    joins: [],
+
     join<S, AA extends string>(
-      alias: AliasModel<Alias<S, AA>>,
+      model: AliasModel<Alias<S, AA>>,
       join: Join,
       on: JoinOptions<T & Alias<S, AA>>
     ): AliasModel<T & Alias<S, AA>> {
-      this.joins.push({})
+      this.joins.push(
+        `${join} JOIN \`${model.name}\` AS ${model.alias} ON ${parseOptions(
+          on,
+          Object.keys(this.keys)
+        )}`
+      )
       return <AliasModel<T & Alias<S, AA>>>(<any>this)
+    },
+
+    select(query?: SelectOptions<T>): Promise<T[]> {
+      const sql: string[] = [
+        `SELECT ${query?.$columns?.join(', ') ?? '*'} FROM \`${name}\` AS ${this.alias}`,
+      ]
+      this.joins.length && sql.push(this.joins.join(' '))
+      query?.$where && sql.push(`WHERE ${parseOptions(query.$where, Object.keys(this.keys))}`)
+      return connection.query<RowDataPacket[]>(sql.join(' ')).then(([rows]) => rows as T[])
     },
   }
 }
-/*
-as<A extends string>(alias: A): AliasModelType<T, A> {
-  this.alias = alias
-  return <AliasModelType<T, A>>(<any>{
-    ...this,
-    join<S, AA extends string>(
-      model: AliasModelType<S, AA>,
-      options: JoinOptions<AliasModelKeys<T, A> & AliasModelKeys<S, AA>>
-    ) {
-      return join<AliasModelType<T, A>, AliasModelKeys<T, A>, S, AA>(
-        <ModelType<AliasModelType<T, A>>>(<any>this),
-        model,
-        options
-      )
-    },
-  })
-},
-
-function join<T, K, S, A extends string>(
-  original: ModelType<T>,
-  model: AliasModelType<S, A>,
-  options: JoinOptions<K & AliasModelKeys<S, A>>
-): ModelType<K & AliasModelKeys<S, A>> {
-  original.joins.push({ model, options })
-  return <ModelType<K & AliasModelKeys<S, A>>>(<any>original)
-}
-
-*/

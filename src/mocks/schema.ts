@@ -2,9 +2,9 @@ import { ConnectionOptions, Schema } from '../'
 
 const options: ConnectionOptions = {
   host: 'localhost',
-  password: 'password',
+  password: '!TestPassword123',
   port: 3306,
-  user: 'root',
+  user: 'tsorm',
 }
 
 export const mockSchema = new Schema('mock', options)
