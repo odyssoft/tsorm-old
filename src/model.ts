@@ -1,9 +1,21 @@
 import { FieldPacket, OkPacket, Pool, RowDataPacket } from 'mysql2/promise'
-import { KeyOf, ModelKeys, QueryType, SelectOptions, Where, WhereOptions } from './'
+import {
+  Alias,
+  AliasModel,
+  Join,
+  JoinOptions,
+  KeyOf,
+  ModelKeys,
+  QueryType,
+  SelectOptions,
+  Where,
+  WhereOptions,
+} from './'
 import { formatValue, getIdKey, getInsertKeys, getInsertValues, parseOptions } from './utils'
 
 export function createModel<T>(name: string, keys: ModelKeys<T>, connection: Pool) {
   const Keys: string[] = Object.keys(keys)
+
   return class Model {
     data: T
     constructor(data: T) {
@@ -21,6 +33,9 @@ export function createModel<T>(name: string, keys: ModelKeys<T>, connection: Poo
           return this.data
         })
     }
+
+    public static as = <A extends string>(alias: A) =>
+      aliasModel<Alias<T, A>>(alias, name, (<unknown>keys) as ModelKeys<Alias<T, A>>, connection)
 
     public static insert = (data: T | T[]): Promise<[OkPacket, FieldPacket[]]> => {
       const insertKeys: string[] = getInsertKeys(data)
@@ -124,5 +139,40 @@ export function createModel<T>(name: string, keys: ModelKeys<T>, connection: Poo
 
     public static upsertMany = (data: T[]): Promise<boolean> =>
       this.upsert(data).then(([{ affectedRows }]) => affectedRows > 0)
+  }
+}
+
+export function aliasModel<T>(
+  alias: string,
+  name: string,
+  keys: ModelKeys<T>,
+  connection: Pool
+): AliasModel<T> {
+  return {
+    alias,
+    keys: Object.keys(keys).map((key) => `${alias}.${key}`),
+    name,
+    joins: [],
+
+    join<S, AA extends string>(
+      model: AliasModel<Alias<S, AA>>,
+      join: Join,
+      on: JoinOptions<T & Alias<S, AA>>
+    ): AliasModel<T & Alias<S, AA>> {
+      this.keys.push(...model.keys)
+      this.joins.push(
+        `${join} JOIN \`${model.name}\` AS ${model.alias} ON ${parseOptions(on, this.keys)}`
+      )
+      return <AliasModel<T & Alias<S, AA>>>(<any>this)
+    },
+
+    select(query?: SelectOptions<T>): Promise<T[]> {
+      const sql: string[] = [
+        `SELECT ${query?.$columns?.join(', ') ?? '*'} FROM \`${name}\` AS ${this.alias}`,
+      ]
+      this.joins.length && sql.push(this.joins.join(' '))
+      query?.$where && sql.push(`WHERE ${parseOptions(query.$where, this.keys)}`)
+      return connection.query<RowDataPacket[]>(sql.join(' ')).then(([rows]) => rows as T[])
+    },
   }
 }

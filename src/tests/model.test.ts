@@ -40,10 +40,106 @@ describe('model', () => {
     })
   })
 
+  describe('as', () => {
+    it('should return an alias model', () => {
+      const alias = User.as('u')
+      expect(alias.alias).toBe('u')
+      expect(alias.keys).toEqual(['u.userId', 'u.username', 'u.email', 'u.password'])
+    })
+
+    describe('join()', () => {
+      it('should return correct join sql with correct combined keys', () => {
+        const join = User.as('u').join(Post.as('p'), 'INNER', {
+          'u.userId': 'p.userId',
+        })
+
+        expect(join.alias).toBe('u')
+        expect(join.joins).toEqual(['INNER JOIN `post` AS p ON u.userId = p.userId'])
+        expect(join.keys).toEqual([
+          'u.userId',
+          'u.username',
+          'u.email',
+          'u.password',
+          'p.postId',
+          'p.userId',
+          'p.post',
+        ])
+      })
+    })
+
+    describe('select()', () => {
+      it('should return correct select script without where clause', () => {
+        User.as('u')
+          .join(Post.as('p'), 'INNER', {
+            'u.userId': 'p.userId',
+          })
+          .select()
+        expect(mockQuery).toHaveBeenCalledWith(
+          `SELECT * FROM \`user\` AS u INNER JOIN \`post\` AS p ON u.userId = p.userId`
+        )
+      })
+
+      it('should return correct select script with specified columns', () => {
+        User.as('u')
+          .join(Post.as('p'), 'INNER', {
+            'u.userId': 'p.userId',
+          })
+          .select({
+            $columns: ['u.userId', 'u.username', 'u.email', 'p.postId', 'p.userId', 'p.post'],
+          })
+        expect(mockQuery).toHaveBeenCalledWith(
+          `SELECT u.userId, u.username, u.email, p.postId, p.userId, p.post FROM \`user\` AS u INNER JOIN \`post\` AS p ON u.userId = p.userId`
+        )
+      })
+
+      it('should return correct select script with where clause', () => {
+        User.as('u')
+          .join(Post.as('p'), 'INNER', {
+            'u.userId': 'p.userId',
+          })
+          .select({
+            $where: {
+              'u.userId': 1,
+              'p.postId': {
+                $between: {
+                  min: 1,
+                  max: 10,
+                },
+              },
+            },
+          })
+        expect(mockQuery).toHaveBeenCalledWith(
+          `SELECT * FROM \`user\` AS u INNER JOIN \`post\` AS p ON u.userId = p.userId WHERE u.userId = 1 AND p.postId BETWEEN 1 AND 10`
+        )
+      })
+
+      it('should return correct select script with where clause', () => {
+        User.as('u')
+          .join(Post.as('p'), 'INNER', {
+            'u.userId': 'p.userId',
+          })
+          .select({
+            $columns: ['u.userId', 'u.username', 'u.email', 'p.postId', 'p.userId', 'p.post'],
+            $where: {
+              'u.userId': 1,
+              'p.postId': {
+                $between: {
+                  min: 1,
+                  max: 10,
+                },
+              },
+            },
+          })
+        expect(mockQuery).toHaveBeenCalledWith(
+          `SELECT u.userId, u.username, u.email, p.postId, p.userId, p.post FROM \`user\` AS u INNER JOIN \`post\` AS p ON u.userId = p.userId WHERE u.userId = 1 AND p.postId BETWEEN 1 AND 10`
+        )
+      })
+    })
+  })
+
   describe('insert', () => {
     it('should call query with correct params for single insert', async () => {
       await User.insert({ ...mockUser })
-      console.log({ mockUser })
       expect(mockQuery).toHaveBeenCalledWith(
         `INSERT INTO \`user\` (email, password, username) VALUES ('test@test.com', 'password', 'testUser')`
       )

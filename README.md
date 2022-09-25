@@ -304,3 +304,50 @@ const orExample = User.find({
   ],
 })
 ```
+
+### Joins
+
+```typescript
+const joinExample = User.as('u')
+  .join(Post.as('p'), 'INNER', {
+    'u.userId': 'p.userId',
+  })
+  .select(query)
+//  Where query is an optional object containing selected columns and or a where clause
+```
+
+### Join query
+
+```typescript
+//  An example for the above join select query using both columns and where clause
+const query = {
+  $columns: ['u.userId', 'u.username', 'p.postId', 'p.content'],
+  $where: {
+    'u.userId': 1,
+    'p.postId': 1,
+  },
+}
+```
+
+The above query would result in the following sql query
+
+```sql
+SELECT
+u.userId,
+u.username,
+p.postId,
+p.content
+
+FROM
+`user` AS u
+
+INNER JOIN
+`post` AS p
+ON
+u.userId = p.userId
+
+WHERE
+u.userId = 1
+AND
+p.postId = 1
+```

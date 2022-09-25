@@ -128,6 +128,5 @@ export const parseValue = (key: string, value: any, keys?: string[]): string => 
   }
   const Operator: any = operator(key, keys)
   const [id] = Object.keys(value)
-  console.log({ id })
   return Operator[id](value[id])
 }
