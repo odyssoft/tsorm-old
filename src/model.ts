@@ -3,7 +3,6 @@ import {
   Alias,
   AliasModel,
   Join,
-  JoinObject,
   JoinOptions,
   KeyOf,
   ModelKeys,
@@ -151,7 +150,7 @@ export function aliasModel<T>(
 ): AliasModel<T> {
   return {
     alias,
-    keys,
+    keys: Object.keys(keys).map((key) => `${alias}.${key}`),
     name,
     joins: [],
 
@@ -160,11 +159,9 @@ export function aliasModel<T>(
       join: Join,
       on: JoinOptions<T & Alias<S, AA>>
     ): AliasModel<T & Alias<S, AA>> {
+      this.keys.push(...model.keys)
       this.joins.push(
-        `${join} JOIN \`${model.name}\` AS ${model.alias} ON ${parseOptions(
-          on,
-          Object.keys(this.keys)
-        )}`
+        `${join} JOIN \`${model.name}\` AS ${model.alias} ON ${parseOptions(on, this.keys)}`
       )
       return <AliasModel<T & Alias<S, AA>>>(<any>this)
     },
@@ -174,7 +171,7 @@ export function aliasModel<T>(
         `SELECT ${query?.$columns?.join(', ') ?? '*'} FROM \`${name}\` AS ${this.alias}`,
       ]
       this.joins.length && sql.push(this.joins.join(' '))
-      query?.$where && sql.push(`WHERE ${parseOptions(query.$where, Object.keys(this.keys))}`)
+      query?.$where && sql.push(`WHERE ${parseOptions(query.$where, this.keys)}`)
       return connection.query<RowDataPacket[]>(sql.join(' ')).then(([rows]) => rows as T[])
     },
   }

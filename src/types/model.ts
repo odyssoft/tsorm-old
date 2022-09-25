@@ -12,16 +12,10 @@ export type AliasModel<T> = {
     join: Join,
     on: JoinOptions<T & Alias<S, A>>
   ) => AliasModel<T & Alias<S, A>>
-  select: (query: SelectOptions<T>) => Promise<T[]>
+  select: (query?: SelectOptions<T>) => Promise<T[]>
 }
 
 export type Join = 'CROSS' | 'INNER' | 'LEFT' | 'RIGHT' | 'LEFT OUTER' | 'RIGHT OUTER'
-
-export type JoinObject = {
-  model: AliasModel<any>
-  join: Join
-  on: any
-}
 
 export type ModelKeys<T> = {
   [key in KeyOf<T>]-?: ColumnOptions
