@@ -353,3 +353,20 @@ u.userId = 1
 AND
 p.postId = 1
 ```
+
+### Group by, Order by, Limit and Offset
+
+Group by, order by, limit and offset can be added to the query on the select methods.
+
+```typescript
+User.select({
+  $columns: [...],
+  $where: {...},
+  //  $groupBy can be an array or a string
+  $groupBy: ['username'],
+  //  $orderBy can be an array or a string with optional appended ASC or DESC
+  $orderBy: ['username'],
+  //  $limit can be a string or an array where the array is [offset, limit]
+  $limit: 10,
+})
+```

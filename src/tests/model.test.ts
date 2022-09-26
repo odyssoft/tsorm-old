@@ -134,6 +134,109 @@ describe('model', () => {
           `SELECT u.userId, u.username, u.email, p.postId, p.userId, p.post FROM \`user\` AS u INNER JOIN \`post\` AS p ON u.userId = p.userId WHERE u.userId = 1 AND p.postId BETWEEN 1 AND 10`
         )
       })
+
+      it('should return correct select script with single group by', () => {
+        User.as('u')
+          .join(Post.as('p'), 'INNER', {
+            'u.userId': 'p.userId',
+          })
+          .select({
+            $groupBy: 'u.userId',
+          })
+        expect(mockQuery).toHaveBeenCalledWith(
+          `SELECT * FROM \`user\` AS u INNER JOIN \`post\` AS p ON u.userId = p.userId GROUP BY u.userId`
+        )
+      })
+
+      it('should return correct select script with multiple group by', () => {
+        User.as('u')
+          .join(Post.as('p'), 'INNER', {
+            'u.userId': 'p.userId',
+          })
+          .select({
+            $groupBy: ['u.userId', 'p.postId'],
+          })
+        expect(mockQuery).toHaveBeenCalledWith(
+          `SELECT * FROM \`user\` AS u INNER JOIN \`post\` AS p ON u.userId = p.userId GROUP BY u.userId, p.postId`
+        )
+      })
+
+      it('should return correct select script with multiple order by', () => {
+        User.as('u')
+          .join(Post.as('p'), 'INNER', {
+            'u.userId': 'p.userId',
+          })
+          .select({
+            $orderBy: ['u.userId', 'p.postId DESC'],
+          })
+        expect(mockQuery).toHaveBeenCalledWith(
+          `SELECT * FROM \`user\` AS u INNER JOIN \`post\` AS p ON u.userId = p.userId ORDER BY u.userId, p.postId DESC`
+        )
+      })
+
+      it('should return correct select script with single order by', () => {
+        User.as('u')
+          .join(Post.as('p'), 'INNER', {
+            'u.userId': 'p.userId',
+          })
+          .select({
+            $orderBy: 'p.postId ASC',
+          })
+        expect(mockQuery).toHaveBeenCalledWith(
+          `SELECT * FROM \`user\` AS u INNER JOIN \`post\` AS p ON u.userId = p.userId ORDER BY p.postId ASC`
+        )
+      })
+
+      it('should return correct select script with limit', () => {
+        User.as('u')
+          .join(Post.as('p'), 'INNER', {
+            'u.userId': 'p.userId',
+          })
+          .select({
+            $limit: 10,
+          })
+        expect(mockQuery).toHaveBeenCalledWith(
+          `SELECT * FROM \`user\` AS u INNER JOIN \`post\` AS p ON u.userId = p.userId LIMIT 10`
+        )
+      })
+
+      it('should return correct select script with limit and skip', () => {
+        User.as('u')
+          .join(Post.as('p'), 'INNER', {
+            'u.userId': 'p.userId',
+          })
+          .select({
+            $limit: [1, 2],
+          })
+        expect(mockQuery).toHaveBeenCalledWith(
+          `SELECT * FROM \`user\` AS u INNER JOIN \`post\` AS p ON u.userId = p.userId LIMIT 1, 2`
+        )
+      })
+
+      it('should return correct script with all options', () => {
+        User.as('u')
+          .join(Post.as('p'), 'INNER', {
+            'u.userId': 'p.userId',
+          })
+          .select({
+            $columns: ['u.userId', 'u.username', 'u.email', 'p.postId', 'p.userId', 'p.post'],
+            $where: {
+              'u.userId': 1,
+              'p.postId': {
+                $between: {
+                  min: 1,
+                  max: 10,
+                },
+              },
+            },
+            $groupBy: ['u.userId', 'p.postId'],
+            $orderBy: ['u.userId', 'p.postId'],
+            $limit: 10,
+          })
+        expect(mockQuery).toHaveBeenCalledWith(
+          `SELECT u.userId, u.username, u.email, p.postId, p.userId, p.post FROM \`user\` AS u INNER JOIN \`post\` AS p ON u.userId = p.userId WHERE u.userId = 1 AND p.postId BETWEEN 1 AND 10 GROUP BY u.userId, p.postId ORDER BY u.userId, p.postId LIMIT 10`
+        )
+      })
     })
   })
 
@@ -326,6 +429,62 @@ describe('model', () => {
       const users = await User.select()
       expect(mockQuery).toHaveBeenCalledWith(`SELECT * FROM \`user\``)
       expect(users).toEqual([[{ ...mockUser, userId: 1 }]])
+    })
+
+    it('should call query with correct query using single group by', () => {
+      User.select({
+        $where: { userId: { $greaterThanEqual: 1 } },
+        $groupBy: 'userId',
+      })
+      expect(mockQuery).toHaveBeenCalledWith(
+        `SELECT * FROM \`user\` WHERE userId >= 1 GROUP BY userId`
+      )
+    })
+
+    it('should call query with correct query using multiple group by', () => {
+      User.select({
+        $where: { userId: { $greaterThanEqual: 1 } },
+        $groupBy: ['userId', 'email'],
+      })
+      expect(mockQuery).toHaveBeenCalledWith(
+        `SELECT * FROM \`user\` WHERE userId >= 1 GROUP BY userId, email`
+      )
+    })
+
+    it('should call query with correct query using single order by', () => {
+      User.select({
+        $where: { userId: { $greaterThanEqual: 1 } },
+        $orderBy: 'userId',
+      })
+      expect(mockQuery).toHaveBeenCalledWith(
+        `SELECT * FROM \`user\` WHERE userId >= 1 ORDER BY userId`
+      )
+    })
+
+    it('should call query with correct query using multiple order by', () => {
+      User.select({
+        $where: { userId: { $greaterThanEqual: 1 } },
+        $orderBy: ['userId ASC', 'email DESC'],
+      })
+      expect(mockQuery).toHaveBeenCalledWith(
+        `SELECT * FROM \`user\` WHERE userId >= 1 ORDER BY userId ASC, email DESC`
+      )
+    })
+
+    it('should call query with correct query using limit', () => {
+      User.select({
+        $where: { userId: { $greaterThanEqual: 1 } },
+        $limit: 10,
+      })
+      expect(mockQuery).toHaveBeenCalledWith(`SELECT * FROM \`user\` WHERE userId >= 1 LIMIT 10`)
+    })
+
+    it('should call query with correct query using limit and skip', () => {
+      User.select({
+        $where: { userId: { $greaterThanEqual: 1 } },
+        $limit: [1, 2],
+      })
+      expect(mockQuery).toHaveBeenCalledWith(`SELECT * FROM \`user\` WHERE userId >= 1 LIMIT 1, 2`)
     })
   })
 

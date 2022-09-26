@@ -31,3 +31,8 @@ export const User = mockSchema.createModel<IUser>('user', {
     required: true,
   },
 })
+
+User.select({
+  $groupBy: ['email'],
+  $orderBy: 'email ASC',
+})

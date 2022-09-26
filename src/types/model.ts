@@ -6,7 +6,6 @@ export type Alias<T, A extends string> = {
 
 export type AliasModel<T> = {
   [key: string]: any
-  // keys: ModelKeys<T>
   join: <S, A extends string>(
     alias: AliasModel<Alias<S, A>>,
     join: Join,
@@ -33,9 +32,19 @@ export type QueryType<T> =
   | OperatorType<T>[]
   | StringOverride
 
+export type Limit = number | [LimitStart, LimitEnd]
+export type LimitStart = number
+export type LimitEnd = number
+
+export type GroupBy<T> = KeyOf<T>
+export type OrderBy<T> = KeyOf<T> | `${KeyOf<T>} ASC` | `${KeyOf<T>} DESC`
+
 export interface SelectOptions<T> {
   $columns?: KeyOf<T>[]
   $where?: Where<T>
+  $limit?: Limit
+  $groupBy?: GroupBy<T> | GroupBy<T>[]
+  $orderBy?: OrderBy<T> | OrderBy<T>[]
 }
 
 export interface StringOverride extends String {}
