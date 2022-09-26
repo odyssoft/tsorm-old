@@ -1,3 +1,5 @@
+[![Codecov Coverage](https://img.shields.io/codecov/c/github/odyssoft/tsorm/main.svg?style=flat-square)](https://codecov.io/gh/odyssoft/tsorm/)
+
 # TSORM
 
 TypeScript ORM for MySQL with node.js
