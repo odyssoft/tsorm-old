@@ -13,6 +13,7 @@ const jestConfig: Config.InitialOptions = {
   testRegex: '/tests/.*test\\.ts?$',
   moduleFileExtensions: ['ts', 'js'],
   testPathIgnorePatterns: ['/node_modules/', '/src/mocks'],
+  coverageDirectory: '../coverage',
 }
 
 export default jestConfig
