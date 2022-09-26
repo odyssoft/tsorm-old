@@ -89,18 +89,26 @@ export function createModel<T>(name: string, keys: ModelKeys<T>, connection: Poo
       this.select({ $where: { [getIdKey(keys)]: id } }).then(([rows]) => rows[0] as T)
     public static findOne = (query?: Where<T>): Promise<T> =>
       //  @ts-ignore
-      this.select({ $where: query }, 1).then(([rows]) => rows[0] as T)
+      this.select({ $where: query, $limit: 1 }).then(([rows]) => rows[0] as T)
     public static findOneBy = (key: KeyOf<T>, query: QueryType<T>): Promise<T> =>
       //  @ts-ignore
-      this.select({ $where: { [key]: query } }, 1).then(([rows]) => rows[0] as T)
+      this.select({ $where: { [key]: query }, $limit: 1 }).then(([rows]) => rows[0] as T)
 
     public static select = (
-      query?: SelectOptions<T>,
-      limit?: number
+      query?: SelectOptions<T>
     ): Promise<[RowDataPacket[], FieldPacket[]]> => {
       const sql: string[] = [`SELECT ${query?.$columns?.join(', ') || '*'} FROM \`${name}\``]
       query?.$where && sql.push(`WHERE ${parseOptions(query.$where, Keys)}`)
-      limit && sql.push(`LIMIT ${limit}`)
+      query?.$groupBy &&
+        sql.push(
+          `GROUP BY ${Array.isArray(query.$groupBy) ? query.$groupBy.join(', ') : query.$groupBy}`
+        )
+      query?.$orderBy &&
+        sql.push(
+          `ORDER BY ${Array.isArray(query.$orderBy) ? query.$orderBy.join(', ') : query.$orderBy}`
+        )
+      query?.$limit &&
+        sql.push(`LIMIT ${Array.isArray(query.$limit) ? query.$limit.join(', ') : query.$limit}`)
       return connection.query<RowDataPacket[]>(sql.join(' '))
     }
 
@@ -172,6 +180,16 @@ export function aliasModel<T>(
       ]
       this.joins.length && sql.push(this.joins.join(' '))
       query?.$where && sql.push(`WHERE ${parseOptions(query.$where, this.keys)}`)
+      query?.$groupBy &&
+        sql.push(
+          `GROUP BY ${Array.isArray(query.$groupBy) ? query.$groupBy.join(', ') : query.$groupBy}`
+        )
+      query?.$orderBy &&
+        sql.push(
+          `ORDER BY ${Array.isArray(query.$orderBy) ? query.$orderBy.join(', ') : query.$orderBy}`
+        )
+      query?.$limit &&
+        sql.push(`LIMIT ${Array.isArray(query.$limit) ? query.$limit.join(', ') : query.$limit}`)
       return connection.query<RowDataPacket[]>(sql.join(' ')).then(([rows]) => rows as T[])
     },
   }
