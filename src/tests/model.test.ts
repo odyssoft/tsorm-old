@@ -382,6 +382,13 @@ describe('model', () => {
       expect(mockQuery).toHaveBeenCalledWith(`SELECT * FROM \`user\` WHERE userId = 1`)
       expect(user).toEqual(mockUser)
     })
+
+    it('should call query with correct params and return null with no results', async () => {
+      mockResponse = []
+      const user = await User.findById(1)
+      expect(mockQuery).toHaveBeenCalledWith(`SELECT * FROM \`user\` WHERE userId = 1`)
+      expect(user).toBeNull()
+    })
   })
 
   describe('findOne', () => {
@@ -391,6 +398,13 @@ describe('model', () => {
       expect(mockQuery).toHaveBeenCalledWith(`SELECT * FROM \`user\` WHERE userId >= 1 LIMIT 1`)
       expect(user).toEqual(mockUser)
     })
+
+    it('should call query with correct params and return null with no results', async () => {
+      mockResponse = []
+      const user = await User.findOne({ userId: { $greaterThanEqual: 1 } })
+      expect(mockQuery).toHaveBeenCalledWith(`SELECT * FROM \`user\` WHERE userId >= 1 LIMIT 1`)
+      expect(user).toBeNull()
+    })
   })
 
   describe('findOneBy', () => {
@@ -399,6 +413,13 @@ describe('model', () => {
       const user = await User.findOneBy('userId', { $greaterThanEqual: 1 })
       expect(mockQuery).toHaveBeenCalledWith(`SELECT * FROM \`user\` WHERE userId >= 1 LIMIT 1`)
       expect(user).toEqual(mockUser)
+    })
+
+    it('should call query with correct params and return null with no results', async () => {
+      mockResponse = []
+      const user = await User.findOneBy('userId', { $greaterThanEqual: 1 })
+      expect(mockQuery).toHaveBeenCalledWith(`SELECT * FROM \`user\` WHERE userId >= 1 LIMIT 1`)
+      expect(user).toBeNull()
     })
   })
 

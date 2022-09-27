@@ -84,15 +84,21 @@ export function createModel<T>(name: string, keys: ModelKeys<T>, connection: Poo
     public static findBy = (key: KeyOf<T>, query: QueryType<T>): Promise<T[]> =>
       //  @ts-ignore
       this.select({ $where: { [key]: query } }).then(([rows]) => rows as T[])
-    public static findById = (id: number): Promise<T> =>
+    public static findById = (id: number): Promise<T | null> =>
       //  @ts-ignore
-      this.select({ $where: { [getIdKey(keys)]: id } }).then(([rows]) => rows[0] as T)
-    public static findOne = (query?: Where<T>): Promise<T> =>
+      this.select({ $where: { [getIdKey(keys)]: id } }).then(([rows]) =>
+        rows.length ? (rows[0] as T) : null
+      )
+    public static findOne = (query?: Where<T>): Promise<T | null> =>
       //  @ts-ignore
-      this.select({ $where: query, $limit: 1 }).then(([rows]) => rows[0] as T)
-    public static findOneBy = (key: KeyOf<T>, query: QueryType<T>): Promise<T> =>
+      this.select({ $where: query, $limit: 1 }).then(([rows]) =>
+        rows.length ? (rows[0] as T) : null
+      )
+    public static findOneBy = (key: KeyOf<T>, query: QueryType<T>): Promise<T | null> =>
       //  @ts-ignore
-      this.select({ $where: { [key]: query }, $limit: 1 }).then(([rows]) => rows[0] as T)
+      this.select({ $where: { [key]: query }, $limit: 1 }).then(([rows]) =>
+        rows.length ? (rows[0] as T) : null
+      )
 
     public static select = (
       query?: SelectOptions<T>
