@@ -1,4 +1,5 @@
 export * from './column'
+export * from './datatypes'
 export * from './model'
 export * from './schema'
 export * from './utils'
