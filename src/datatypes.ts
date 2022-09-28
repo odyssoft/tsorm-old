@@ -58,7 +58,7 @@ export const DataTypes: DataTypesType = {
    * @param {array} options
    * @returns String
    */
-  enum: (options: string[]): DataType => `ENUM(${options.join(', ')})`,
+  enum: (options: string[]): DataType => `ENUM(${options.map((o) => `'${o}'`).join(', ')})`,
   /**
    * A floating point number. The total number of digits is specified in size. The number of digits after the decimal point is specified in the d parameter. This syntax is deprecated in MySQL 8.0.17, and it will be removed in future MySQL versions
    * @param {number} size
@@ -78,7 +78,7 @@ export const DataTypes: DataTypesType = {
    * @param {array} options
    * @returns String
    */
-  set: (options: string[]): DataType => `SET(${options.join(', ')})`,
+  set: (options: string[]): DataType => `SET(${options.map((o) => `'${o}'`).join(', ')})`,
   smallInt: 'SMALLINT',
   /**
    * Holds a string with a maximum length of 65,535 bytes
