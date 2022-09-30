@@ -177,7 +177,7 @@ describe('utils', () => {
         required: true,
         default: 'test',
       })
-      expect(result).toBe("`test` VARCHAR(255) AUTO_INCREMENT PRIMARY KEY NOT NULL DEFAULT 'test'")
+      expect(result).toBe('`test` VARCHAR(255) AUTO_INCREMENT PRIMARY KEY NOT NULL DEFAULT test')
     })
 
     it('should return correct string with default as number', () => {
