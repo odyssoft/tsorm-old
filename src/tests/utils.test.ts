@@ -1,3 +1,4 @@
+import { DataTypes } from '../datatypes'
 import { ModelKeys } from '../types'
 import {
   formatValue,
@@ -16,13 +17,12 @@ type IMock = {
 }
 const mockKeys: ModelKeys<IMock> = {
   id: {
-    type: 'INT',
+    type: DataTypes.int,
     autoIncrement: true,
     primaryKey: true,
   },
   name: {
-    type: 'VARCHAR',
-    length: 255,
+    type: DataTypes.varchar(255),
   },
 }
 
@@ -78,12 +78,11 @@ describe('utils', () => {
     it('should return key beginning with id and key is primary', () => {
       const result = getIdKey<{ idkey: number; name: string }>({
         idkey: {
-          type: 'INT',
+          type: DataTypes.int,
           primaryKey: true,
         },
         name: {
-          type: 'VARCHAR',
-          length: 255,
+          type: DataTypes.varchar(255),
           required: true,
         },
       })
@@ -93,12 +92,11 @@ describe('utils', () => {
     it('should return key ending with id and key is primary', () => {
       const result = getIdKey<{ keyid: number; name: string }>({
         keyid: {
-          type: 'INT',
+          type: DataTypes.int,
           primaryKey: true,
         },
         name: {
-          type: 'VARCHAR',
-          length: 255,
+          type: DataTypes.varchar(255),
           required: true,
         },
       })
@@ -108,12 +106,11 @@ describe('utils', () => {
     it('should return key without id in the name', () => {
       const result = getIdKey<{ mainkey: number; name: string }>({
         mainkey: {
-          type: 'INT',
+          type: DataTypes.int,
           primaryKey: true,
         },
         name: {
-          type: 'VARCHAR',
-          length: 255,
+          type: DataTypes.varchar(255),
           required: true,
         },
       })
@@ -174,8 +171,7 @@ describe('utils', () => {
   describe('mapKey()', () => {
     it('should return correct string with default as string', () => {
       const result = mapKey('test', {
-        type: 'VARCHAR',
-        length: 255,
+        type: DataTypes.varchar(255),
         autoIncrement: true,
         primaryKey: true,
         required: true,
@@ -186,7 +182,7 @@ describe('utils', () => {
 
     it('should return correct string with default as number', () => {
       const result = mapKey('test', {
-        type: 'INT',
+        type: DataTypes.int,
         autoIncrement: true,
         primaryKey: true,
         required: true,
@@ -281,13 +277,12 @@ describe('utils', () => {
     }
     const mockAliasKeys: ModelKeys<IMockAlias> = {
       't.id': {
-        type: 'INT',
+        type: DataTypes.int,
         autoIncrement: true,
         primaryKey: true,
       },
       't.name': {
-        type: 'VARCHAR',
-        length: 255,
+        type: DataTypes.varchar(255),
       },
     }
 

@@ -1,3 +1,4 @@
+import { DataTypes } from '../../datatypes'
 import { mockSchema } from '../schema'
 
 export interface IPost {
@@ -11,15 +12,14 @@ export const Post = mockSchema.createModel<IPost>('post', {
     autoIncrement: true,
     primaryKey: true,
     required: true,
-    type: 'INT',
+    type: DataTypes.int,
   },
   userId: {
     required: true,
-    type: 'INT',
+    type: DataTypes.int,
   },
   post: {
     required: true,
-    type: 'VARCHAR',
-    length: 255,
+    type: DataTypes.varchar(255),
   },
 })
