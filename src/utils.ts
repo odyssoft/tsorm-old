@@ -85,10 +85,7 @@ export const mapKey = (key: string, options: ColumnOptions) => {
   options.autoIncrement && tableKey.push('AUTO_INCREMENT')
   options.primaryKey && tableKey.push('PRIMARY KEY')
   options.required && tableKey.push('NOT NULL')
-  options.default !== undefined &&
-    tableKey.push(
-      `DEFAULT ${typeof options.default === 'string' ? `'${options.default}'` : options.default}`
-    )
+  options.default !== undefined && tableKey.push(`DEFAULT ${options.default}`)
   return tableKey.join(' ')
 }
 
