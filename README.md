@@ -31,6 +31,7 @@ export const mySchema = new Schema('my_schema', {
 ### Database/models/user.ts
 
 ```typescript
+import { DataTypes } from '@odyssoft/tsorm'
 import mySchema from '../schema'
 
 export interface IUser {
@@ -44,23 +45,20 @@ export const User = mockSchema.createModel<IUser>('user', {
   userId: {
     primaryKey: true,
     autoIncrement: true,
-    type: 'INT',
+    type: DataTypes.int,
   },
   username: {
-    type: 'VARCHAR',
-    length: 40,
+    type: DataTypes.varchar(40),
     required: true,
     unique: true,
   },
   email: {
-    type: 'VARCHAR',
-    length: 310,
+    type: DataTypes.varchar(310),
     required: true,
     unique: true,
   },
   password: {
-    type: 'VARCHAR',
-    length: 500,
+    type: DataTypes.varchar(500),
     required: true,
   },
 })
