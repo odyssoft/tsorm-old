@@ -25,11 +25,11 @@ export class Schema {
 
   createModel<T>(name: string, keys: ModelKeys<T>) {
     this.queries.push(
-      `CREATE TABLE IF NOT EXISTS ${name} (${Object.keys(keys)
+      `CREATE TABLE IF NOT EXISTS \`${name}\` (${Object.keys(keys)
         .map((key) => mapKey(key, keys[key]))
         .join(', ')})`
     )
-    return createModel<T>(name, keys, this.connection)
+    return createModel<T>(name, keys, this.connection, this.name)
   }
 
   close() {
