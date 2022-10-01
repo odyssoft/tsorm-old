@@ -24,7 +24,8 @@ export const formatValue = (
   if (input === true || input === false) {
     return input ? 1 : 0
   }
-  let output: any = `'${input}'`
+  let output: string = `${input}`.replace(/'/g, "\\'")
+  output = `'${output}'`
   if (keys && input && keys.includes(input)) {
     output = input
   }
