@@ -37,7 +37,13 @@ export function createModel<T>(name: string, keys: ModelKeys<T>, connection: Poo
     }
 
     public static as = <A extends string>(alias: A) =>
-      aliasModel<Alias<T, A>>(alias, name, (<unknown>keys) as ModelKeys<Alias<T, A>>, connection)
+      aliasModel<Alias<T, A>>(
+        alias,
+        name,
+        (<unknown>keys) as ModelKeys<Alias<T, A>>,
+        connection,
+        schema
+      )
 
     public static insert = (data: T | T[]): Promise<[OkPacket, FieldPacket[]]> => {
       const insertKeys: string[] = getInsertKeys(data)
@@ -169,7 +175,8 @@ export function aliasModel<T>(
   alias: string,
   name: string,
   keys: ModelKeys<T>,
-  connection: Pool
+  connection: Pool,
+  schema: string
 ): AliasModel<T> {
   return {
     alias,
@@ -191,7 +198,9 @@ export function aliasModel<T>(
 
     select(query?: SelectOptions<T>): Promise<T[]> {
       const sql: string[] = [
-        `SELECT ${query?.$columns?.join(', ') ?? '*'} FROM \`${name}\` AS ${this.alias}`,
+        `USE ${schema}; SELECT ${query?.$columns?.join(', ') ?? '*'} FROM \`${name}\` AS ${
+          this.alias
+        }`,
       ]
       this.joins.length && sql.push(this.joins.join(' '))
       query?.$where && sql.push(`WHERE ${parseOptions(query.$where, this.keys)}`)
