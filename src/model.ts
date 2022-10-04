@@ -26,9 +26,7 @@ export function createModel<T>(name: string, keys: ModelKeys<T>, connection: Poo
       const insertKeys: string[] = getInsertKeys(this.data)
       const insertValues: string = getInsertValues(this.data, insertKeys)
       return connection
-        .query<OkPacket>(
-          `USE ${schema}; INSERT INTO \`${name}\` (${insertKeys.join(', ')}) ${insertValues}`
-        )
+        .query<OkPacket>(`INSERT INTO \`${name}\` (${insertKeys.join(', ')}) ${insertValues}`)
         .then(([{ insertId }]) => {
           //  @ts-ignore
           this.data[getIdKey(keys)] = insertId
@@ -49,7 +47,7 @@ export function createModel<T>(name: string, keys: ModelKeys<T>, connection: Poo
       const insertKeys: string[] = getInsertKeys(data)
       const insertValues: string = getInsertValues(data, insertKeys)
       return connection.query<OkPacket>(
-        `USE ${schema}; INSERT INTO \`${name}\` (${insertKeys.join(', ')}) ${insertValues}`
+        `INSERT INTO \`${name}\` (${insertKeys.join(', ')}) ${insertValues}`
       )
     }
 
@@ -69,7 +67,7 @@ export function createModel<T>(name: string, keys: ModelKeys<T>, connection: Poo
 
     public static delete = (query: Where<T>, limit?: number): Promise<[OkPacket, FieldPacket[]]> =>
       connection.query<OkPacket>(
-        `USE ${schema}; DELETE FROM \`${name}\` WHERE ${parseOptions(query, Keys)}${
+        `DELETE FROM \`${name}\` WHERE ${parseOptions(query, Keys)}${
           limit ? ` LIMIT ${limit}` : ''
         }`
       )
@@ -111,9 +109,7 @@ export function createModel<T>(name: string, keys: ModelKeys<T>, connection: Poo
     public static select = (
       query?: SelectOptions<T>
     ): Promise<[RowDataPacket[], FieldPacket[]]> => {
-      const sql: string[] = [
-        `USE ${schema}; SELECT ${query?.$columns?.join(', ') || '*'} FROM \`${name}\``,
-      ]
+      const sql: string[] = [`SELECT ${query?.$columns?.join(', ') || '*'} FROM \`${name}\``]
       query?.$where && sql.push(`WHERE ${parseOptions(query.$where, Keys)}`)
       query?.$groupBy &&
         sql.push(
@@ -129,25 +125,20 @@ export function createModel<T>(name: string, keys: ModelKeys<T>, connection: Poo
     }
 
     public static truncate = (): Promise<[OkPacket, FieldPacket[]]> =>
-      connection.query<OkPacket>(`USE ${schema}; TRUNCATE TABLE \`${name}\``)
+      connection.query<OkPacket>(`TRUNCATE TABLE \`${name}\``)
 
     public static update = (
       data: Partial<T>,
       query: WhereOptions<T>
     ): Promise<[OkPacket, FieldPacket[]]> =>
       connection.query<OkPacket>(
-        `USE ${schema}; UPDATE \`${name}\` SET ${parseOptions(data, Keys)} WHERE ${parseOptions(
-          query,
-          Keys
-        )}`
+        `UPDATE \`${name}\` SET ${parseOptions(data, Keys)} WHERE ${parseOptions(query, Keys)}`
       )
 
     public static upsert = (data: T | T[]): Promise<[OkPacket, FieldPacket[]]> => {
       const insertKeys = getInsertKeys<Partial<T>>(data)
       const insertValues = getInsertValues<Partial<T>>(data, insertKeys)
-      const sql: string[] = [
-        `USE ${schema}; INSERT INTO \`${name}\` (${insertKeys.join(', ')}) ${insertValues}`,
-      ]
+      const sql: string[] = [`INSERT INTO \`${name}\` (${insertKeys.join(', ')}) ${insertValues}`]
 
       Array.isArray(data) && sql.push('AS MANY')
       sql.push(`ON DUPLICATE KEY UPDATE`)
@@ -198,9 +189,7 @@ export function aliasModel<T>(
 
     select(query?: SelectOptions<T>): Promise<T[]> {
       const sql: string[] = [
-        `USE ${schema}; SELECT ${query?.$columns?.join(', ') ?? '*'} FROM \`${name}\` AS ${
-          this.alias
-        }`,
+        `SELECT ${query?.$columns?.join(', ') ?? '*'} FROM \`${name}\` AS ${this.alias}`,
       ]
       this.joins.length && sql.push(this.joins.join(' '))
       query?.$where && sql.push(`WHERE ${parseOptions(query.$where, this.keys)}`)
