@@ -33,7 +33,7 @@ describe('model', () => {
       const user = await new User({ ...mockUser }).save()
 
       expect(mockQuery).toHaveBeenCalledWith(
-        "INSERT INTO `user` (email, password, username) VALUES ('test@test.com', 'password', 'testUser')"
+        "INSERT INTO `user` (`email`, `password`, `username`) VALUES ('test@test.com', 'password', 'testUser')"
       )
 
       expect(user.userId).toBe(1)
@@ -244,7 +244,7 @@ describe('model', () => {
     it('should call query with correct params for single insert', async () => {
       await User.insert({ ...mockUser })
       expect(mockQuery).toHaveBeenCalledWith(
-        `INSERT INTO \`user\` (email, password, username) VALUES ('test@test.com', 'password', 'testUser')`
+        `INSERT INTO \`user\` (\`email\`, \`password\`, \`username\`) VALUES ('test@test.com', 'password', 'testUser')`
       )
     })
 
@@ -252,7 +252,7 @@ describe('model', () => {
       await User.insert([{ ...mockUser }, { ...mockUser2 }])
 
       expect(mockQuery).toHaveBeenCalledWith(
-        `INSERT INTO \`user\` (email, password, username) VALUES ('test@test.com', 'password', 'testUser'), ('test2@test.com', 'password2', 'testUser2')`
+        `INSERT INTO \`user\` (\`email\`, \`password\`, \`username\`) VALUES ('test@test.com', 'password', 'testUser'), ('test2@test.com', 'password2', 'testUser2')`
       )
     })
   })
@@ -262,7 +262,7 @@ describe('model', () => {
       mockResponse = { insertId: 123 }
       const user = await User.create({ ...mockUser })
       expect(mockQuery).toHaveBeenCalledWith(
-        `INSERT INTO \`user\` (email, password, username) VALUES ('test@test.com', 'password', 'testUser')`
+        `INSERT INTO \`user\` (\`email\`, \`password\`, \`username\`) VALUES ('test@test.com', 'password', 'testUser')`
       )
       expect(user).toEqual({
         ...mockUser,
@@ -276,7 +276,7 @@ describe('model', () => {
       mockResponse = { insertId: 123 }
       const users = await User.createMany([{ ...mockUser }, { ...mockUser2 }])
       expect(mockQuery).toHaveBeenCalledWith(
-        `INSERT INTO \`user\` (email, password, username) VALUES ('test@test.com', 'password', 'testUser'), ('test2@test.com', 'password2', 'testUser2')`
+        `INSERT INTO \`user\` (\`email\`, \`password\`, \`username\`) VALUES ('test@test.com', 'password', 'testUser'), ('test2@test.com', 'password2', 'testUser2')`
       )
       expect(users).toEqual([
         {
@@ -549,7 +549,7 @@ describe('model', () => {
       mockResponse = { affectedRows: 1 }
       const result = await User.upsert({ ...mockUser, userId: 1 })
       expect(mockQuery).toHaveBeenCalledWith(
-        `INSERT INTO \`user\` (email, password, username, userId) VALUES ('test@test.com', 'password', 'testUser', 1) ON DUPLICATE KEY UPDATE email = 'test@test.com', password = 'password', username = 'testUser'`
+        `INSERT INTO \`user\` (\`email\`, \`password\`, \`username\`, \`userId\`) VALUES ('test@test.com', 'password', 'testUser', 1) ON DUPLICATE KEY UPDATE \`email\` = 'test@test.com', \`password\` = 'password', \`username\` = 'testUser'`
       )
       expect(result).toEqual([{ affectedRows: 1 }])
     })
@@ -560,7 +560,7 @@ describe('model', () => {
       mockResponse = { affectedRows: 1 }
       const result = await User.upsertOne({ ...mockUser, userId: 1 })
       expect(mockQuery).toHaveBeenCalledWith(
-        `INSERT INTO \`user\` (email, password, username, userId) VALUES ('test@test.com', 'password', 'testUser', 1) ON DUPLICATE KEY UPDATE email = 'test@test.com', password = 'password', username = 'testUser'`
+        `INSERT INTO \`user\` (\`email\`, \`password\`, \`username\`, \`userId\`) VALUES ('test@test.com', 'password', 'testUser', 1) ON DUPLICATE KEY UPDATE \`email\` = 'test@test.com', \`password\` = 'password', \`username\` = 'testUser'`
       )
       expect(result).toBe(true)
     })
@@ -574,7 +574,7 @@ describe('model', () => {
         { ...mockUser2, userId: 2 },
       ])
       expect(mockQuery).toHaveBeenCalledWith(
-        `INSERT INTO \`user\` (email, password, username, userId) VALUES ('test@test.com', 'password', 'testUser', 1), ('test2@test.com', 'password2', 'testUser2', 2) AS MANY ON DUPLICATE KEY UPDATE email = MANY.email, password = MANY.password, username = MANY.username`
+        `INSERT INTO \`user\` (\`email\`, \`password\`, \`username\`, \`userId\`) VALUES ('test@test.com', 'password', 'testUser', 1), ('test2@test.com', 'password2', 'testUser2', 2) AS MANY ON DUPLICATE KEY UPDATE \`email\` = MANY.email, \`password\` = MANY.password, \`username\` = MANY.username`
       )
       expect(result).toBe(true)
     })

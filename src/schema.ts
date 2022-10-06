@@ -24,10 +24,12 @@ export class Schema {
   }
 
   createModel<T>(name: string, keys: ModelKeys<T>) {
+    const Keys = Object.keys(keys)
+    const primaries = Keys.filter((k) => keys[k].primaryKey).map((k) => `\`${k}\``)
     this.queries.push(
-      `CREATE TABLE IF NOT EXISTS \`${name}\` (${Object.keys(keys)
-        .map((key) => mapKey(key, keys[key]))
-        .join(', ')})`
+      `CREATE TABLE IF NOT EXISTS \`${name}\` (${Keys.map((key) => mapKey(key, keys[key])).join(
+        ', '
+      )}${primaries.length ? `, PRIMARY KEY (${primaries.join(', ')})` : ''})`
     )
     return createModel<T>(name, keys, this.connection, this.name)
   }

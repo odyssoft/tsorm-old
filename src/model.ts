@@ -26,7 +26,11 @@ export function createModel<T>(name: string, keys: ModelKeys<T>, connection: Poo
       const insertKeys: string[] = getInsertKeys(this.data)
       const insertValues: string = getInsertValues(this.data, insertKeys)
       return connection
-        .query<OkPacket>(`INSERT INTO \`${name}\` (${insertKeys.join(', ')}) ${insertValues}`)
+        .query<OkPacket>(
+          `INSERT INTO \`${name}\` (${insertKeys
+            .map((k) => `\`${k}\``)
+            .join(', ')}) ${insertValues}`
+        )
         .then(([{ insertId }]) => {
           //  @ts-ignore
           this.data[getIdKey(keys)] = insertId
@@ -47,7 +51,7 @@ export function createModel<T>(name: string, keys: ModelKeys<T>, connection: Poo
       const insertKeys: string[] = getInsertKeys(data)
       const insertValues: string = getInsertValues(data, insertKeys)
       return connection.query<OkPacket>(
-        `INSERT INTO \`${name}\` (${insertKeys.join(', ')}) ${insertValues}`
+        `INSERT INTO \`${name}\` (${insertKeys.map((k) => `\`${k}\``).join(', ')}) ${insertValues}`
       )
     }
 
@@ -138,17 +142,19 @@ export function createModel<T>(name: string, keys: ModelKeys<T>, connection: Poo
     public static upsert = (data: T | T[]): Promise<[OkPacket, FieldPacket[]]> => {
       const insertKeys = getInsertKeys<Partial<T>>(data)
       const insertValues = getInsertValues<Partial<T>>(data, insertKeys)
-      const sql: string[] = [`INSERT INTO \`${name}\` (${insertKeys.join(', ')}) ${insertValues}`]
+      const sql: string[] = [
+        `INSERT INTO \`${name}\` (${insertKeys.map((k) => `\`${k}\``).join(', ')}) ${insertValues}`,
+      ]
 
       Array.isArray(data) && sql.push('AS MANY')
       sql.push(`ON DUPLICATE KEY UPDATE`)
       const rows: string[] = []
 
       insertKeys
-        .filter((key) => !keys[key].primaryKey)
+        .filter((key) => !keys[key]?.primaryKey)
         .forEach((key) =>
           //  @ts-ignore
-          rows.push(`${key} = ${Array.isArray(data) ? `MANY.${key}` : formatValue(data[key])}`)
+          rows.push(`\`${key}\` = ${Array.isArray(data) ? `MANY.${key}` : formatValue(data[key])}`)
         )
       sql.push(rows.join(', '))
       return connection.query<OkPacket>(sql.join(' '))
