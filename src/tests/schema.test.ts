@@ -58,4 +58,42 @@ describe('Schema', () => {
     testSchema.close()
     expect(mockEnd).toHaveBeenCalled()
   })
+
+  it('should create table with no primary keys when no primary key specified', (done) => {
+    const testSchema = new Schema('test', mockOptions)
+    testSchema.createModel('test', {
+      id: {
+        type: 'INT',
+      },
+      otherId: {
+        type: 'INT',
+      },
+    })
+    setTimeout(() => {
+      expect(mockQuery).toHaveBeenCalledWith(
+        'CREATE TABLE IF NOT EXISTS `test` (`id` INT, `otherId` INT)'
+      )
+      done()
+    }, 100)
+  })
+
+  it('should create table with multiple primary keys when specified', (done) => {
+    const testSchema = new Schema('test', mockOptions)
+    testSchema.createModel('test', {
+      id: {
+        type: 'INT',
+        primaryKey: true,
+      },
+      otherId: {
+        type: 'INT',
+        primaryKey: true,
+      },
+    })
+    setTimeout(() => {
+      expect(mockQuery).toHaveBeenCalledWith(
+        'CREATE TABLE IF NOT EXISTS `test` (`id` INT, `otherId` INT, PRIMARY KEY (`id`, `otherId`))'
+      )
+      done()
+    }, 100)
+  })
 })

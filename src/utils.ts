@@ -84,7 +84,7 @@ export const getInsertValues = <T>(data: T | T[], keys: string[]): string => {
 export const mapKey = (key: string, options: ColumnOptions) => {
   const tableKey: string[] = [`\`${key}\` ${options.type}`]
   options.autoIncrement && tableKey.push('AUTO_INCREMENT')
-  options.primaryKey && tableKey.push('PRIMARY KEY')
+  // options.primaryKey && tableKey.push('PRIMARY KEY')
   options.required && tableKey.push('NOT NULL')
   options.default !== undefined && tableKey.push(`DEFAULT ${options.default}`)
   return tableKey.join(' ')
