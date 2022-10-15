@@ -30,10 +30,3 @@ export const User = mockSchema.createModel<IUser>('user', {
     required: true,
   },
 })
-
-User.as('u')
-.join(
-  Post.as('p'), 'INNER', {
-    "u.userId": 'p.postId'
-  }
-)
