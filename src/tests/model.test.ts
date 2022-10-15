@@ -38,6 +38,17 @@ describe('model', () => {
 
       expect(user.userId).toBe(1)
     })
+
+    it('should call query with correct params and return correct database entry with ignore', async () => {
+      mockResponse = { insertId: 1 }
+      const user = await new User({ ...mockUser }).save({ ignore: true })
+
+      expect(mockQuery).toHaveBeenCalledWith(
+        "INSERT IGNORE INTO `user` (`email`, `password`, `username`) VALUES ('test@test.com', 'password', 'testUser')"
+      )
+
+      expect(user.userId).toBe(1)
+    })
   })
 
   describe('as', () => {
@@ -46,198 +57,6 @@ describe('model', () => {
       expect(alias.alias).toBe('u')
       expect(alias.keys).toEqual(['u.userId', 'u.username', 'u.email', 'u.password'])
     })
-
-    describe('join()', () => {
-      it('should return correct join sql with correct combined keys', () => {
-        const join = User.as('u').join(Post.as('p'), 'INNER', {
-          'u.userId': 'p.userId',
-        })
-
-        expect(join.alias).toBe('u')
-        expect(join.joins).toEqual(['INNER JOIN `post` AS p ON u.userId = p.userId'])
-        expect(join.keys).toEqual([
-          'u.userId',
-          'u.username',
-          'u.email',
-          'u.password',
-          'p.postId',
-          'p.userId',
-          'p.post',
-        ])
-      })
-    })
-
-    describe('select()', () => {
-      it('should return correct select script without where clause', () => {
-        User.as('u')
-          .join(Post.as('p'), 'INNER', {
-            'u.userId': 'p.userId',
-          })
-          .select()
-        expect(mockQuery).toHaveBeenCalledWith(
-          `SELECT * FROM \`user\` AS u INNER JOIN \`post\` AS p ON u.userId = p.userId`
-        )
-      })
-
-      it('should return correct select script with specified columns', () => {
-        User.as('u')
-          .join(Post.as('p'), 'INNER', {
-            'u.userId': 'p.userId',
-          })
-          .select({
-            $columns: ['u.userId', 'u.username', 'u.email', 'p.postId', 'p.userId', 'p.post'],
-          })
-        expect(mockQuery).toHaveBeenCalledWith(
-          `SELECT u.userId, u.username, u.email, p.postId, p.userId, p.post FROM \`user\` AS u INNER JOIN \`post\` AS p ON u.userId = p.userId`
-        )
-      })
-
-      it('should return correct select script with where clause', () => {
-        User.as('u')
-          .join(Post.as('p'), 'INNER', {
-            'u.userId': 'p.userId',
-          })
-          .select({
-            $where: {
-              'u.userId': 1,
-              'p.postId': {
-                $between: {
-                  min: 1,
-                  max: 10,
-                },
-              },
-            },
-          })
-        expect(mockQuery).toHaveBeenCalledWith(
-          `SELECT * FROM \`user\` AS u INNER JOIN \`post\` AS p ON u.userId = p.userId WHERE u.userId = 1 AND p.postId BETWEEN 1 AND 10`
-        )
-      })
-
-      it('should return correct select script with where clause', () => {
-        User.as('u')
-          .join(Post.as('p'), 'INNER', {
-            'u.userId': 'p.userId',
-          })
-          .select({
-            $columns: ['u.userId', 'u.username', 'u.email', 'p.postId', 'p.userId', 'p.post'],
-            $where: {
-              'u.userId': 1,
-              'p.postId': {
-                $between: {
-                  min: 1,
-                  max: 10,
-                },
-              },
-            },
-          })
-        expect(mockQuery).toHaveBeenCalledWith(
-          `SELECT u.userId, u.username, u.email, p.postId, p.userId, p.post FROM \`user\` AS u INNER JOIN \`post\` AS p ON u.userId = p.userId WHERE u.userId = 1 AND p.postId BETWEEN 1 AND 10`
-        )
-      })
-
-      it('should return correct select script with single group by', () => {
-        User.as('u')
-          .join(Post.as('p'), 'INNER', {
-            'u.userId': 'p.userId',
-          })
-          .select({
-            $groupBy: 'u.userId',
-          })
-        expect(mockQuery).toHaveBeenCalledWith(
-          `SELECT * FROM \`user\` AS u INNER JOIN \`post\` AS p ON u.userId = p.userId GROUP BY u.userId`
-        )
-      })
-
-      it('should return correct select script with multiple group by', () => {
-        User.as('u')
-          .join(Post.as('p'), 'INNER', {
-            'u.userId': 'p.userId',
-          })
-          .select({
-            $groupBy: ['u.userId', 'p.postId'],
-          })
-        expect(mockQuery).toHaveBeenCalledWith(
-          `SELECT * FROM \`user\` AS u INNER JOIN \`post\` AS p ON u.userId = p.userId GROUP BY u.userId, p.postId`
-        )
-      })
-
-      it('should return correct select script with multiple order by', () => {
-        User.as('u')
-          .join(Post.as('p'), 'INNER', {
-            'u.userId': 'p.userId',
-          })
-          .select({
-            $orderBy: ['u.userId', 'p.postId DESC'],
-          })
-        expect(mockQuery).toHaveBeenCalledWith(
-          `SELECT * FROM \`user\` AS u INNER JOIN \`post\` AS p ON u.userId = p.userId ORDER BY u.userId, p.postId DESC`
-        )
-      })
-
-      it('should return correct select script with single order by', () => {
-        User.as('u')
-          .join(Post.as('p'), 'INNER', {
-            'u.userId': 'p.userId',
-          })
-          .select({
-            $orderBy: 'p.postId ASC',
-          })
-        expect(mockQuery).toHaveBeenCalledWith(
-          `SELECT * FROM \`user\` AS u INNER JOIN \`post\` AS p ON u.userId = p.userId ORDER BY p.postId ASC`
-        )
-      })
-
-      it('should return correct select script with limit', () => {
-        User.as('u')
-          .join(Post.as('p'), 'INNER', {
-            'u.userId': 'p.userId',
-          })
-          .select({
-            $limit: 10,
-          })
-        expect(mockQuery).toHaveBeenCalledWith(
-          `SELECT * FROM \`user\` AS u INNER JOIN \`post\` AS p ON u.userId = p.userId LIMIT 10`
-        )
-      })
-
-      it('should return correct select script with limit and skip', () => {
-        User.as('u')
-          .join(Post.as('p'), 'INNER', {
-            'u.userId': 'p.userId',
-          })
-          .select({
-            $limit: [1, 2],
-          })
-        expect(mockQuery).toHaveBeenCalledWith(
-          `SELECT * FROM \`user\` AS u INNER JOIN \`post\` AS p ON u.userId = p.userId LIMIT 1, 2`
-        )
-      })
-
-      it('should return correct script with all options', () => {
-        User.as('u')
-          .join(Post.as('p'), 'INNER', {
-            'u.userId': 'p.userId',
-          })
-          .select({
-            $columns: ['u.userId', 'u.username', 'u.email', 'p.postId', 'p.userId', 'p.post'],
-            $where: {
-              'u.userId': 1,
-              'p.postId': {
-                $between: {
-                  min: 1,
-                  max: 10,
-                },
-              },
-            },
-            $groupBy: ['u.userId', 'p.postId'],
-            $orderBy: ['u.userId', 'p.postId'],
-            $limit: 10,
-          })
-        expect(mockQuery).toHaveBeenCalledWith(
-          `SELECT u.userId, u.username, u.email, p.postId, p.userId, p.post FROM \`user\` AS u INNER JOIN \`post\` AS p ON u.userId = p.userId WHERE u.userId = 1 AND p.postId BETWEEN 1 AND 10 GROUP BY u.userId, p.postId ORDER BY u.userId, p.postId LIMIT 10`
-        )
-      })
-    })
   })
 
   describe('insert', () => {
@@ -245,6 +64,13 @@ describe('model', () => {
       await User.insert({ ...mockUser })
       expect(mockQuery).toHaveBeenCalledWith(
         `INSERT INTO \`user\` (\`email\`, \`password\`, \`username\`) VALUES ('test@test.com', 'password', 'testUser')`
+      )
+    })
+
+    it('should call query with correct params with ignore', async () => {
+      await User.insert({ ...mockUser }, { ignore: true })
+      expect(mockQuery).toHaveBeenCalledWith(
+        `INSERT IGNORE INTO \`user\` (\`email\`, \`password\`, \`username\`) VALUES ('test@test.com', 'password', 'testUser')`
       )
     })
 
@@ -305,7 +131,7 @@ describe('model', () => {
       mockResponse = { affectedRows: 4 }
       const result = await User.deleteBy('userId', { $greaterThanEqual: 1 })
       expect(mockQuery).toHaveBeenCalledWith(`DELETE FROM \`user\` WHERE userId >= 1`)
-      expect(result).toEqual([{ affectedRows: 4 }])
+      expect(result).toEqual(4)
     })
   })
 
@@ -577,6 +403,18 @@ describe('model', () => {
         `INSERT INTO \`user\` (\`email\`, \`password\`, \`username\`, \`userId\`) VALUES ('test@test.com', 'password', 'testUser', 1), ('test2@test.com', 'password2', 'testUser2', 2) AS MANY ON DUPLICATE KEY UPDATE \`email\` = MANY.email, \`password\` = MANY.password, \`username\` = MANY.username`
       )
       expect(result).toBe(true)
+    })
+  })
+
+  describe('SQL', () => {
+    it('should have correct properties', () => {
+      const sql = User.SQL()
+      expect(sql).toHaveProperty('delete')
+      expect(sql).toHaveProperty('insert')
+      expect(sql).toHaveProperty('select')
+      expect(sql).toHaveProperty('truncate')
+      expect(sql).toHaveProperty('update')
+      expect(sql).toHaveProperty('upsert')
     })
   })
 })

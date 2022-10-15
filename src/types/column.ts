@@ -1,4 +1,4 @@
-import { DataType } from './datatypes'
+import { DataType } from './'
 
 export interface ColumnOptions {
   autoIncrement?: boolean

@@ -1,8 +1,8 @@
-import { createModel } from './model'
-import { createPool, Pool } from 'mysql2/promise'
-import { mapKey } from './utils'
+import { createPool, OkPacket, Pool, RowDataPacket } from 'mysql2/promise'
 
-import { ConnectionOptions, KeyOf, ModelKeys } from './types'
+import { createModel } from './model'
+import { mapKey } from './utils'
+import { ConnectionOptions, ModelKeys } from './types'
 
 export class Schema {
   public name: string
@@ -33,6 +33,9 @@ export class Schema {
     )
     return createModel<T>(name, keys, this.connection, this.name)
   }
+
+  query = <T extends RowDataPacket[] | RowDataPacket[][] | OkPacket | OkPacket[]>(sql: string) =>
+    this.connection.query<T>(sql)
 
   close() {
     this.connection.end()

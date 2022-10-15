@@ -1,5 +1,6 @@
 import { DataTypes } from '../../datatypes'
 import { mockSchema } from '../schema'
+import { Post } from './post'
 
 export interface IUser {
   userId?: number

@@ -1,27 +1,53 @@
-import { ColumnOptions, Indexable, KeyOf, OperatorType, Or } from './'
+import { FieldPacket, OkPacket, RowDataPacket } from 'mysql2'
 
-export type Alias<T, A extends string> = {
-  [K in keyof T as K extends string ? `${A}.${K}` : never]: T[K]
+import { Alias, AliasModel, ColumnOptions, Indexable, KeyOf, OperatorType, Or } from './'
+
+export type DeleteOptions = {
+  limit?: number
 }
-
-export type AliasModel<T> = {
-  [key: string]: any
-  join: <S, A extends string>(
-    alias: AliasModel<Alias<S, A>>,
-    join: Join,
-    on: JoinOptions<T & Alias<S, A>>
-  ) => AliasModel<T & Alias<S, A>>
-  select: (query?: SelectOptions<T>) => Promise<T[]>
-}
-
-export type Join = 'CROSS' | 'INNER' | 'LEFT' | 'RIGHT' | 'LEFT OUTER' | 'RIGHT OUTER'
 
 export type ModelKeys<T> = {
   [key in KeyOf<T>]-?: ColumnOptions
 } & Indexable
 
-export type JoinOptions<T> = {
-  [Key in KeyOf<T>]?: number | null | OperatorType<T> | OperatorType<T>[]
+export type ModelType<T> = {
+  new (data: T): {
+    data: T
+    save: (options?: InsertOptions) => Promise<T>
+  }
+
+  delete: (query: Where<T>, limit?: number) => Promise<[OkPacket, FieldPacket[]]>
+  insert: (data: T | T[], options?: InsertOptions) => Promise<[OkPacket, FieldPacket[]]>
+  select: (query?: SelectOptions<T>) => Promise<[RowDataPacket[], FieldPacket[]]>
+  truncate: () => Promise<[OkPacket, FieldPacket[]]>
+  update: (data: Partial<T>, query: WhereOptions<T>) => Promise<[OkPacket, FieldPacket[]]>
+  upsert: (data: T | T[]) => Promise<[OkPacket, FieldPacket[]]>
+
+  SQL: () => SQLModelType<T>
+
+  as: <A extends string>(alias: A) => AliasModel<Alias<T, A>>
+
+  create: (data: T, options?: InsertOptions) => Promise<T>
+  createOne: (data: T, options?: InsertOptions) => Promise<T>
+  createMany: (data: T[], options?: InsertOptions) => Promise<T[]>
+
+  deleteBy: (key: KeyOf<T>, query: QueryType<T>) => Promise<number>
+  deleteById: (id: number) => Promise<boolean>
+  deleteOne: (query: Where<T>) => Promise<boolean>
+  deleteOneBy: (key: KeyOf<T>, query: QueryType<T>) => Promise<boolean>
+
+  find: (query?: Where<T>) => Promise<T[]>
+  findBy: (key: KeyOf<T>, query: QueryType<T>) => Promise<T[]>
+  findById: (id: number) => Promise<T | null>
+  findOne: (query?: Where<T>) => Promise<T | null>
+  findOneBy: (key: KeyOf<T>, query: QueryType<T>) => Promise<T | null>
+
+  upsertOne: (data: T) => Promise<boolean>
+  upsertMany: (data: T[]) => Promise<boolean>
+}
+
+export type InsertOptions = {
+  ignore?: boolean
 }
 
 export type QueryType<T> =
@@ -45,6 +71,15 @@ export interface SelectOptions<T> {
   $limit?: Limit
   $groupBy?: GroupBy<T> | GroupBy<T>[]
   $orderBy?: OrderBy<T> | OrderBy<T>[]
+}
+
+export type SQLModelType<T> = {
+  delete: (query: Where<T>, limit?: number) => string
+  insert: (data: T | T[], options?: InsertOptions) => string
+  select: (query?: SelectOptions<T>) => string
+  truncate: () => string
+  update: (data: Partial<T>, query: WhereOptions<T>) => string
+  upsert: (data: T | T[]) => string
 }
 
 export interface StringOverride extends String {}
