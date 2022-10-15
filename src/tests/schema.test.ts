@@ -96,4 +96,10 @@ describe('Schema', () => {
       done()
     }, 100)
   })
+
+  it('should call query with passed sql', () => {
+    const testSchema = new Schema('test', mockOptions)
+    testSchema.query('SELECT * FROM test')
+    expect(mockQuery).toHaveBeenCalledWith('SELECT * FROM test')
+  })
 })

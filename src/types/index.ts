@@ -1,3 +1,4 @@
+export * from './aliasModel'
 export * from './column'
 export * from './datatypes'
 export * from './model'

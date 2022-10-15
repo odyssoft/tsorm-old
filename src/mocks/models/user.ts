@@ -1,5 +1,6 @@
 import { DataTypes } from '../../datatypes'
 import { mockSchema } from '../schema'
+import { Post } from './post'
 
 export interface IUser {
   userId?: number
@@ -29,3 +30,10 @@ export const User = mockSchema.createModel<IUser>('user', {
     required: true,
   },
 })
+
+User.as('u')
+.join(
+  Post.as('p'), 'INNER', {
+    "u.userId": 'p.postId'
+  }
+)

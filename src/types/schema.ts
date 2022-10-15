@@ -1,4 +1,5 @@
 import { Pool, PoolOptions } from 'mysql2/promise'
+
 import { KeyOf, ModelKeys } from './'
 
 export interface ConnectionOptions extends PoolOptions {
@@ -11,13 +12,9 @@ export interface ConnectionOptions extends PoolOptions {
 export type ModelsKeys<T> = {
   [K in keyof T]: ModelKeys<T[K]>
 }
-// export type Models<T> = {
-//   [K in keyof T]: ModelType<T[K]>
-// }
 
 export type SchemaType<T> = {
   connection: Pool
-  // models: Models<T>
   name: string
 
   close: () => void
