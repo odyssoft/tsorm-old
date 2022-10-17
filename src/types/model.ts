@@ -66,7 +66,7 @@ export type GroupBy<T> = KeyOf<T>
 export type OrderBy<T> = KeyOf<T> | `${KeyOf<T>} ASC` | `${KeyOf<T>} DESC`
 
 export interface SelectOptions<T> {
-  $columns?: KeyOf<T>[]
+  $columns?: KeyOf<T>[] | StringOverride[]
   $where?: Where<T>
   $limit?: Limit
   $groupBy?: GroupBy<T> | GroupBy<T>[]
