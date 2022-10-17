@@ -65,8 +65,10 @@ export type LimitEnd = number
 export type GroupBy<T> = KeyOf<T>
 export type OrderBy<T> = KeyOf<T> | `${KeyOf<T>} ASC` | `${KeyOf<T>} DESC`
 
+export type ColumnType<T> = KeyOf<T> | StringOverride
+
 export interface SelectOptions<T> {
-  $columns?: KeyOf<T>[]
+  $columns?: ColumnType<T>[]
   $where?: Where<T>
   $limit?: Limit
   $groupBy?: GroupBy<T> | GroupBy<T>[]
