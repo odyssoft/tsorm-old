@@ -11,8 +11,39 @@ export type AliasModel<T> = {
     join: Join,
     on: JoinOptions<T & Alias<S, A>>
   ) => AliasModel<T & Alias<S, A>>
+
   select: (query?: SelectOptions<T>) => Promise<T[]>
   SQL: () => SQLAliasModel<T>
+
+  crossJoin: <S, A extends string>(
+    alias: AliasModel<Alias<S, A>>,
+    on: JoinOptions<T & Alias<S, A>>
+  ) => AliasModel<T & Alias<S, A>>
+
+  innerJoin: <S, A extends string>(
+    alias: AliasModel<Alias<S, A>>,
+    on: JoinOptions<T & Alias<S, A>>
+  ) => AliasModel<T & Alias<S, A>>
+
+  leftJoin: <S, A extends string>(
+    alias: AliasModel<Alias<S, A>>,
+    on: JoinOptions<T & Alias<S, A>>
+  ) => AliasModel<T & Alias<S, A>>
+
+  leftOuterJoin: <S, A extends string>(
+    alias: AliasModel<Alias<S, A>>,
+    on: JoinOptions<T & Alias<S, A>>
+  ) => AliasModel<T & Alias<S, A>>
+
+  rightJoin: <S, A extends string>(
+    alias: AliasModel<Alias<S, A>>,
+    on: JoinOptions<T & Alias<S, A>>
+  ) => AliasModel<T & Alias<S, A>>
+
+  rightOuterJoin: <S, A extends string>(
+    alias: AliasModel<Alias<S, A>>,
+    on: JoinOptions<T & Alias<S, A>>
+  ) => AliasModel<T & Alias<S, A>>
 }
 
 export type Join = 'CROSS' | 'INNER' | 'LEFT' | 'RIGHT' | 'LEFT OUTER' | 'RIGHT OUTER'

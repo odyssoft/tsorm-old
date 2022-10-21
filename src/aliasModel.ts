@@ -43,6 +43,48 @@ export function aliasModel<T>(
       })
     },
 
+    crossJoin<S, AA extends string>(
+      model: AliasModel<Alias<S, AA>>,
+      on: JoinOptions<T & Alias<S, AA>>
+    ): AliasModel<T & Alias<S, AA>> {
+      return this.join<S, AA>(model, 'CROSS', on)
+    },
+
+    innerJoin<S, AA extends string>(
+      model: AliasModel<Alias<S, AA>>,
+      on: JoinOptions<T & Alias<S, AA>>
+    ): AliasModel<T & Alias<S, AA>> {
+      return this.join<S, AA>(model, 'INNER', on)
+    },
+
+    leftJoin<S, AA extends string>(
+      model: AliasModel<Alias<S, AA>>,
+      on: JoinOptions<T & Alias<S, AA>>
+    ): AliasModel<T & Alias<S, AA>> {
+      return this.join<S, AA>(model, 'LEFT', on)
+    },
+
+    leftOuterJoin<S, AA extends string>(
+      model: AliasModel<Alias<S, AA>>,
+      on: JoinOptions<T & Alias<S, AA>>
+    ): AliasModel<T & Alias<S, AA>> {
+      return this.join<S, AA>(model, 'LEFT OUTER', on)
+    },
+
+    rightJoin<S, AA extends string>(
+      model: AliasModel<Alias<S, AA>>,
+      on: JoinOptions<T & Alias<S, AA>>
+    ): AliasModel<T & Alias<S, AA>> {
+      return this.join<S, AA>(model, 'RIGHT', on)
+    },
+
+    rightOuterJoin<S, AA extends string>(
+      model: AliasModel<Alias<S, AA>>,
+      on: JoinOptions<T & Alias<S, AA>>
+    ): AliasModel<T & Alias<S, AA>> {
+      return this.join<S, AA>(model, 'RIGHT OUTER', on)
+    },
+
     select(query?: SelectOptions<T>): Promise<T[]> {
       return connection
         .query<RowDataPacket[]>(this.SQL().select(query))
