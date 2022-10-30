@@ -1,6 +1,6 @@
 {
   "name": "@odyssoft/tsorm",
-  "version": "1.0.20",
+  "version": "1.0.21",
   "description": "TypeScript ORM for MySQL",
   "main": "lib/index.js",
   "scripts": {
