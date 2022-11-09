@@ -17,7 +17,10 @@ export type ModelType<T> = {
   }
 
   delete: (query: Where<T>, limit?: number) => Promise<[OkPacket, FieldPacket[]]>
-  insert: (data: T | T[], options?: InsertOptions) => Promise<[OkPacket, FieldPacket[]]>
+  insert: (
+    data: Partial<T> | Partial<T>[],
+    options?: InsertOptions
+  ) => Promise<[OkPacket, FieldPacket[]]>
   select: (query?: SelectOptions<T>) => Promise<[RowDataPacket[], FieldPacket[]]>
   truncate: () => Promise<[OkPacket, FieldPacket[]]>
   update: (data: Partial<T>, query: WhereOptions<T>) => Promise<[OkPacket, FieldPacket[]]>
@@ -27,9 +30,9 @@ export type ModelType<T> = {
 
   as: <A extends string>(alias: A) => AliasModel<Alias<T, A>>
 
-  create: (data: T, options?: InsertOptions) => Promise<T>
-  createOne: (data: T, options?: InsertOptions) => Promise<T>
-  createMany: (data: T[], options?: InsertOptions) => Promise<T[]>
+  create: (data: Partial<T>, options?: InsertOptions) => Promise<Partial<T>>
+  createOne: (data: Partial<T>, options?: InsertOptions) => Promise<Partial<T>>
+  createMany: (data: Partial<T>[], options?: InsertOptions) => Promise<Partial<T>[]>
 
   deleteBy: (key: KeyOf<T>, query: QueryType<T>) => Promise<number>
   deleteById: (id: number) => Promise<boolean>
@@ -77,7 +80,7 @@ export interface SelectOptions<T> {
 
 export type SQLModelType<T> = {
   delete: (query: Where<T>, limit?: number) => string
-  insert: (data: T | T[], options?: InsertOptions) => string
+  insert: (data: Partial<T> | Partial<T>[], options?: InsertOptions) => string
   select: (query?: SelectOptions<T>) => string
   truncate: () => string
   update: (data: Partial<T>, query: WhereOptions<T>) => string
