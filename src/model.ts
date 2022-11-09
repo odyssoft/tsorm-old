@@ -43,7 +43,7 @@ export function createModel<T>(
       connection.query<OkPacket>(SQL.delete(query, limit))
 
     public static insert = (
-      data: T | T[],
+      data: Partial<T> | Partial<T>[],
       options?: InsertOptions
     ): Promise<[OkPacket, FieldPacket[]]> => connection.query<OkPacket>(SQL.insert(data, options))
 
@@ -66,15 +66,18 @@ export function createModel<T>(
     public static as = <A extends string>(alias: A): AliasModel<Alias<T, A>> =>
       aliasModel<Alias<T, A>>(alias, name, (<unknown>keys) as ModelKeys<Alias<T, A>>, connection)
 
-    public static create = (data: T, options?: InsertOptions): Promise<T> =>
+    public static create = (data: Partial<T>, options?: InsertOptions): Promise<Partial<T>> =>
       this.insert(data, options).then(([{ insertId }]) => ({
         ...data,
         [getIdKey(keys)]: insertId,
       }))
     public static createOne = this.create
-    public static createMany = (data: T[], options?: InsertOptions): Promise<T[]> =>
+    public static createMany = (
+      data: Partial<T>[],
+      options?: InsertOptions
+    ): Promise<Partial<T>[]> =>
       this.insert(data, options).then(([{ insertId }]) =>
-        data.map((item: T, index: number) => ({
+        data.map((item: Partial<T>, index: number) => ({
           ...item,
           [getIdKey(keys)]: insertId + index,
         }))
@@ -127,7 +130,7 @@ export function sql<T>(name: string, keys: ModelKeys<T>): SQLModelType<T> {
     delete: (query: Where<T>, limit?: number): string =>
       `DELETE FROM \`${name}\` WHERE ${parseOptions(query, Keys)}${limit ? ` LIMIT ${limit}` : ''}`,
 
-    insert(data: T | T[], options?: InsertOptions): string {
+    insert(data: Partial<T> | Partial<T>[], options?: InsertOptions): string {
       const insertKeys: string[] = getInsertKeys(data)
       const insertValues: string = getInsertValues(data, insertKeys)
       return `INSERT${options?.ignore ? ' IGNORE' : ''} INTO \`${name}\` (${insertKeys
