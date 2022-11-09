@@ -67,6 +67,11 @@ describe('utils', () => {
       const result = formatValue('test', ['test', 'key'])
       expect(result).toBe('test')
     })
+
+    it('should return value when function', () => {
+      const result = formatValue('CURRENT_TIMESTAMP')
+      expect(result).toBe('CURRENT_TIMESTAMP')
+    })
   })
 
   describe('getIdKey', () => {
