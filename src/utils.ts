@@ -1,3 +1,4 @@
+import { isFunction } from 'functions'
 import {
   BetweenType,
   ColumnOptions,
@@ -23,6 +24,9 @@ export const formatValue = (
   }
   if (input === true || input === false) {
     return input ? 1 : 0
+  }
+  if (isFunction(input)) {
+    return input
   }
   let output: string = `${input}`.replace(/'/g, "\\'")
   output = `'${output}'`
