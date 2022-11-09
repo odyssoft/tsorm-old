@@ -115,6 +115,15 @@ export function createModel<T>(
         rows.length ? (rows[0] as T) : null
       )
 
+    public static insertIgnore = (
+      data: Partial<T> | Partial<T>[]
+    ): Promise<Partial<T> | Partial<T>[]> =>
+      this.insert(data, { ignore: true }).then(([{ insertId }]) =>
+        Array.isArray(data)
+          ? data.map((item, index) => ({ ...item, [getIdKey(keys)]: insertId + index }))
+          : { ...data, [getIdKey(keys)]: insertId }
+      )
+
     public static upsertOne = (data: T): Promise<boolean> =>
       this.upsert(data).then(([{ affectedRows }]) => affectedRows === 1)
 

@@ -249,6 +249,32 @@ describe('model', () => {
     })
   })
 
+  describe('insertIgnore', () => {
+    it('should call query with correct params and return correct database entry', async () => {
+      mockResponse = { insertId: 157 }
+      const post = await Post.insertIgnore({ post: 'test', userId: 123 })
+      expect(mockQuery).toHaveBeenCalledWith(
+        `INSERT IGNORE INTO \`post\` (\`post\`, \`userId\`) VALUES ('test', 123)`
+      )
+      expect(post).toEqual({ post: 'test', userId: 123, postId: 157 })
+    })
+
+    it('should call query with correct params and return correct database entries', async () => {
+      mockResponse = { insertId: 158 }
+      const post = await Post.insertIgnore([
+        { post: 'test 1', userId: 123 },
+        { post: 'test 2', userId: 456 },
+      ])
+      expect(mockQuery).toHaveBeenCalledWith(
+        `INSERT IGNORE INTO \`post\` (\`post\`, \`userId\`) VALUES ('test 1', 123), ('test 2', 456)`
+      )
+      expect(post).toEqual([
+        { post: 'test 1', userId: 123, postId: 158 },
+        { post: 'test 2', userId: 456, postId: 159 },
+      ])
+    })
+  })
+
   describe('select', () => {
     it('should call query with correct params and return results with $columns & $with', async () => {
       mockResponse = [{ userId: 1, username: 'test' }]

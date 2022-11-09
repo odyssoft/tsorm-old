@@ -45,6 +45,8 @@ export type ModelType<T> = {
   findOne: (query?: Where<T>) => Promise<T | null>
   findOneBy: (key: KeyOf<T>, query: QueryType<T>) => Promise<T | null>
 
+  insertIgnore: (data: Partial<T> | Partial<T>[]) => Promise<Partial<T> | Partial<T>[]>
+
   upsertOne: (data: T) => Promise<boolean>
   upsertMany: (data: T[]) => Promise<boolean>
 }
