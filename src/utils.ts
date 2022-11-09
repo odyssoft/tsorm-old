@@ -1,4 +1,4 @@
-import { isFunction } from 'functions'
+import { isFunction } from './functions'
 import {
   BetweenType,
   ColumnOptions,
