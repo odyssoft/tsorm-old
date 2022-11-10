@@ -167,7 +167,7 @@ export function sql<T>(name: string, keys: ModelKeys<T>): SQLModelType<T> {
 
     update: (data: Partial<T>, query: WhereOptions<T>): string =>
       `UPDATE \`${name}\` SET ${parseOptions(data, Keys).replace(
-        / AND /,
+        / AND /g,
         ', '
       )} WHERE ${parseOptions(query, Keys)}`,
 
