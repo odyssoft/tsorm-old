@@ -1,15 +1,17 @@
-import { KeyOf, OperatorType, SelectOptions } from './'
+import { KeyOf, OperatorType, Or, SelectOptions } from './'
 
 export type Alias<T, A extends string> = {
   [K in keyof T as K extends string ? `${A}.${K}` : never]: T[K]
 }
+
+export type OnJoin<T> = Or<JoinOptions<T>> | JoinOptions<T>
 
 export type AliasModel<T> = {
   [key: string]: any
   join: <S, A extends string>(
     alias: AliasModel<Alias<S, A>>,
     join: Join,
-    on: JoinOptions<T & Alias<S, A>>
+    on: OnJoin<T & Alias<S, A>>
   ) => AliasModel<T & Alias<S, A>>
 
   select: (query?: SelectOptions<T>) => Promise<T[]>
