@@ -166,7 +166,10 @@ export function sql<T>(name: string, keys: ModelKeys<T>): SQLModelType<T> {
     truncate: (): string => `TRUNCATE TABLE \`${name}\``,
 
     update: (data: Partial<T>, query: WhereOptions<T>): string =>
-      `UPDATE \`${name}\` SET ${parseOptions(data, Keys)} WHERE ${parseOptions(query, Keys)}`,
+      `UPDATE \`${name}\` SET ${parseOptions(data, Keys).replace(
+        / AND /,
+        ', '
+      )} WHERE ${parseOptions(query, Keys)}`,
 
     upsert(data: T | T[]) {
       const insertKeys = getInsertKeys<Partial<T>>(data)
