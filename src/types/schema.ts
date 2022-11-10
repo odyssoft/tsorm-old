@@ -43,7 +43,7 @@ interface Between<T> {
   $lessThanEqual?: never
   $like?: never
   $notBetween?: never
-  $notEqual?: never
+  $notEquals?: never
   $notIn?: never
   $notLike?: never
 }
@@ -58,7 +58,7 @@ interface Equals<T> {
   $lessThanEqual?: never
   $like?: never
   $notBetween?: never
-  $notEqual?: never
+  $notEquals?: never
   $notIn?: never
   $notLike?: never
 }
@@ -73,7 +73,7 @@ interface GreaterThan<T> {
   $lessThanEqual?: never
   $like?: never
   $notBetween?: never
-  $notEqual?: never
+  $notEquals?: never
   $notIn?: never
   $notLike?: never
 }
@@ -88,7 +88,7 @@ interface GreaterThanEqual<T> {
   $lessThanEqual?: never
   $like?: never
   $notBetween?: never
-  $notEqual?: never
+  $notEquals?: never
   $notIn?: never
   $notLike?: never
 }
@@ -103,7 +103,7 @@ interface In {
   $lessThanEqual?: never
   $like?: never
   $notBetween?: never
-  $notEqual?: never
+  $notEquals?: never
   $notIn?: never
   $notLike?: never
 }
@@ -118,7 +118,7 @@ interface LessThan<T> {
   $lessThanEqual?: never
   $like?: never
   $notBetween?: never
-  $notEqual?: never
+  $notEquals?: never
   $notIn?: never
   $notLike?: never
 }
@@ -133,7 +133,7 @@ interface LessThanEqual<T> {
   $lessThanEqual: LessThanEqualType<T>
   $like?: never
   $notBetween?: never
-  $notEqual?: never
+  $notEquals?: never
   $notIn?: never
   $notLike?: never
 }
@@ -148,7 +148,7 @@ interface Like {
   $lessThanEqual?: never
   $like: LikeType
   $notBetween?: never
-  $notEqual?: never
+  $notEquals?: never
   $notIn?: never
   $notLike?: never
 }
@@ -163,11 +163,11 @@ interface NotBetween<T> {
   $lessThanEqual?: never
   $like?: never
   $notBetween: BetweenType<T>
-  $notEqual?: never
+  $notEquals?: never
   $notIn?: never
   $notLike?: never
 }
-interface NotEqual<T> {
+interface NotEquals<T> {
   [key: string]: any
   $between?: never
   $equals?: never
@@ -178,7 +178,7 @@ interface NotEqual<T> {
   $lessThanEqual?: never
   $like?: never
   $notBetween?: never
-  $notEqual: EqualsType<T>
+  $notEquals: EqualsType<T>
   $notIn?: never
   $notLike?: never
 }
@@ -193,7 +193,7 @@ interface NotIn {
   $lessThanEqual?: never
   $like?: never
   $notBetween?: never
-  $notEqual?: never
+  $notEquals?: never
   $notIn: InType
   $notLike?: never
 }
@@ -208,7 +208,7 @@ interface NotLike {
   $lessThanEqual?: never
   $like?: never
   $notBetween?: never
-  $notEqual?: never
+  $notEquals?: never
   $notIn?: never
   $notLike: LikeType
 }
@@ -228,6 +228,6 @@ export type OperatorType<T> =
   | LessThanEqual<T>
   | Like
   | NotBetween<T>
-  | NotEqual<T>
+  | NotEquals<T>
   | NotIn
   | NotLike
