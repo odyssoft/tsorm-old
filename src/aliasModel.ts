@@ -6,6 +6,7 @@ import {
   Join,
   JoinOptions,
   ModelKeys,
+  OnJoin,
   SelectOptions,
   SQLAliasModel,
 } from './types'
@@ -29,7 +30,7 @@ export function aliasModel<T>(
     join<S, AA extends string>(
       model: AliasModel<Alias<S, AA>>,
       join: Join,
-      on: JoinOptions<T & Alias<S, AA>>
+      on: OnJoin<T & Alias<S, AA>>
     ): AliasModel<T & Alias<S, AA>> {
       this.keys.push(...model.keys)
       this.joins.push(
