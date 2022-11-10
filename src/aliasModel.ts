@@ -1,15 +1,6 @@
 import { Pool, RowDataPacket } from 'mysql2/promise'
 
-import {
-  Alias,
-  AliasModel,
-  Join,
-  JoinOptions,
-  ModelKeys,
-  OnJoin,
-  SelectOptions,
-  SQLAliasModel,
-} from './types'
+import { Alias, AliasModel, Join, ModelKeys, OnJoin, SelectOptions, SQLAliasModel } from './types'
 import { parseOptions } from './utils'
 
 export function aliasModel<T>(

@@ -1,4 +1,4 @@
-import { KeyOf, OperatorType, Or, SelectOptions, Where } from './'
+import { KeyOf, OperatorType, Or, SelectOptions, StringOverride } from './'
 
 export type Alias<T, A extends string> = {
   [K in keyof T as K extends string ? `${A}.${K}` : never]: T[K]
@@ -50,7 +50,7 @@ export type AliasModel<T> = {
 
 export type Join = 'CROSS' | 'INNER' | 'LEFT' | 'RIGHT' | 'LEFT OUTER' | 'RIGHT OUTER'
 export type JoinOptions<T> = {
-  [Key in KeyOf<T>]?: number | null | OperatorType<T> | OperatorType<T>[]
+  [Key in KeyOf<T>]?: boolean | number | null | OperatorType<T> | OperatorType<T>[] | StringOverride
 }
 
 export type SQLAliasModel<T> = {
