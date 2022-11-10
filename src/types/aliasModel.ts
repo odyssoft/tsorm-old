@@ -1,4 +1,4 @@
-import { KeyOf, OperatorType, Or, SelectOptions } from './'
+import { KeyOf, OperatorType, Or, SelectOptions, StringOverride } from './'
 
 export type Alias<T, A extends string> = {
   [K in keyof T as K extends string ? `${A}.${K}` : never]: T[K]
@@ -19,38 +19,38 @@ export type AliasModel<T> = {
 
   crossJoin: <S, A extends string>(
     alias: AliasModel<Alias<S, A>>,
-    on: JoinOptions<T & Alias<S, A>>
+    on: OnJoin<T & Alias<S, A>>
   ) => AliasModel<T & Alias<S, A>>
 
   innerJoin: <S, A extends string>(
     alias: AliasModel<Alias<S, A>>,
-    on: JoinOptions<T & Alias<S, A>>
+    on: OnJoin<T & Alias<S, A>>
   ) => AliasModel<T & Alias<S, A>>
 
   leftJoin: <S, A extends string>(
     alias: AliasModel<Alias<S, A>>,
-    on: JoinOptions<T & Alias<S, A>>
+    on: OnJoin<T & Alias<S, A>>
   ) => AliasModel<T & Alias<S, A>>
 
   leftOuterJoin: <S, A extends string>(
     alias: AliasModel<Alias<S, A>>,
-    on: JoinOptions<T & Alias<S, A>>
+    on: OnJoin<T & Alias<S, A>>
   ) => AliasModel<T & Alias<S, A>>
 
   rightJoin: <S, A extends string>(
     alias: AliasModel<Alias<S, A>>,
-    on: JoinOptions<T & Alias<S, A>>
+    on: OnJoin<T & Alias<S, A>>
   ) => AliasModel<T & Alias<S, A>>
 
   rightOuterJoin: <S, A extends string>(
     alias: AliasModel<Alias<S, A>>,
-    on: JoinOptions<T & Alias<S, A>>
+    on: OnJoin<T & Alias<S, A>>
   ) => AliasModel<T & Alias<S, A>>
 }
 
 export type Join = 'CROSS' | 'INNER' | 'LEFT' | 'RIGHT' | 'LEFT OUTER' | 'RIGHT OUTER'
 export type JoinOptions<T> = {
-  [Key in KeyOf<T>]?: number | null | OperatorType<T> | OperatorType<T>[]
+  [Key in KeyOf<T>]?: boolean | number | null | OperatorType<T> | OperatorType<T>[] | StringOverride
 }
 
 export type SQLAliasModel<T> = {

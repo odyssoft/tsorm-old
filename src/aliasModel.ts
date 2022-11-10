@@ -1,15 +1,6 @@
 import { Pool, RowDataPacket } from 'mysql2/promise'
 
-import {
-  Alias,
-  AliasModel,
-  Join,
-  JoinOptions,
-  ModelKeys,
-  OnJoin,
-  SelectOptions,
-  SQLAliasModel,
-} from './types'
+import { Alias, AliasModel, Join, ModelKeys, OnJoin, SelectOptions, SQLAliasModel } from './types'
 import { parseOptions } from './utils'
 
 export function aliasModel<T>(
@@ -46,42 +37,42 @@ export function aliasModel<T>(
 
     crossJoin<S, AA extends string>(
       model: AliasModel<Alias<S, AA>>,
-      on: JoinOptions<T & Alias<S, AA>>
+      on: OnJoin<T & Alias<S, AA>>
     ): AliasModel<T & Alias<S, AA>> {
       return this.join<S, AA>(model, 'CROSS', on)
     },
 
     innerJoin<S, AA extends string>(
       model: AliasModel<Alias<S, AA>>,
-      on: JoinOptions<T & Alias<S, AA>>
+      on: OnJoin<T & Alias<S, AA>>
     ): AliasModel<T & Alias<S, AA>> {
       return this.join<S, AA>(model, 'INNER', on)
     },
 
     leftJoin<S, AA extends string>(
       model: AliasModel<Alias<S, AA>>,
-      on: JoinOptions<T & Alias<S, AA>>
+      on: OnJoin<T & Alias<S, AA>>
     ): AliasModel<T & Alias<S, AA>> {
       return this.join<S, AA>(model, 'LEFT', on)
     },
 
     leftOuterJoin<S, AA extends string>(
       model: AliasModel<Alias<S, AA>>,
-      on: JoinOptions<T & Alias<S, AA>>
+      on: OnJoin<T & Alias<S, AA>>
     ): AliasModel<T & Alias<S, AA>> {
       return this.join<S, AA>(model, 'LEFT OUTER', on)
     },
 
     rightJoin<S, AA extends string>(
       model: AliasModel<Alias<S, AA>>,
-      on: JoinOptions<T & Alias<S, AA>>
+      on: OnJoin<T & Alias<S, AA>>
     ): AliasModel<T & Alias<S, AA>> {
       return this.join<S, AA>(model, 'RIGHT', on)
     },
 
     rightOuterJoin<S, AA extends string>(
       model: AliasModel<Alias<S, AA>>,
-      on: JoinOptions<T & Alias<S, AA>>
+      on: OnJoin<T & Alias<S, AA>>
     ): AliasModel<T & Alias<S, AA>> {
       return this.join<S, AA>(model, 'RIGHT OUTER', on)
     },
