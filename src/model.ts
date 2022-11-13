@@ -21,9 +21,8 @@ export function createModel<T>(
   connection: Pool,
   schema: string
 ): ModelType<T> {
-  const Keys: string[] = Object.keys(keys)
-
-  const SQL = sql(name, keys)
+  const table = `\`${schema}\`.\`${name}\``
+  const SQL = sql(table, keys)
 
   return class Model {
     data: T
@@ -64,7 +63,7 @@ export function createModel<T>(
     public static SQL = () => SQL
 
     public static as = <A extends string>(alias: A): AliasModel<Alias<T, A>> =>
-      aliasModel<Alias<T, A>>(alias, name, (<unknown>keys) as ModelKeys<Alias<T, A>>, connection)
+      aliasModel<Alias<T, A>>(alias, table, (<unknown>keys) as ModelKeys<Alias<T, A>>, connection)
 
     public static create = (data: Partial<T>, options?: InsertOptions): Promise<Partial<T>> =>
       this.insert(data, options).then(([{ insertId }]) => ({
@@ -137,18 +136,18 @@ export function sql<T>(name: string, keys: ModelKeys<T>): SQLModelType<T> {
 
   return {
     delete: (query: Where<T>, limit?: number): string =>
-      `DELETE FROM \`${name}\` WHERE ${parseOptions(query, Keys)}${limit ? ` LIMIT ${limit}` : ''}`,
+      `DELETE FROM ${name} WHERE ${parseOptions(query, Keys)}${limit ? ` LIMIT ${limit}` : ''}`,
 
     insert(data: Partial<T> | Partial<T>[], options?: InsertOptions): string {
       const insertKeys: string[] = getInsertKeys(data)
       const insertValues: string = getInsertValues(data, insertKeys)
-      return `INSERT${options?.ignore ? ' IGNORE' : ''} INTO \`${name}\` (${insertKeys
+      return `INSERT${options?.ignore ? ' IGNORE' : ''} INTO ${name} (${insertKeys
         .map((k) => `\`${k}\``)
         .join(', ')}) ${insertValues}`
     },
 
     select(query?: SelectOptions<T>): string {
-      const sql: string[] = [`SELECT ${query?.$columns?.join(', ') || '*'} FROM \`${name}\``]
+      const sql: string[] = [`SELECT ${query?.$columns?.join(', ') || '*'} FROM ${name}`]
       query?.$where && sql.push(`WHERE ${parseOptions(query.$where, Keys)}`)
       query?.$groupBy &&
         sql.push(
@@ -163,19 +162,19 @@ export function sql<T>(name: string, keys: ModelKeys<T>): SQLModelType<T> {
       return sql.join(' ')
     },
 
-    truncate: (): string => `TRUNCATE TABLE \`${name}\``,
+    truncate: (): string => `TRUNCATE TABLE ${name}`,
 
     update: (data: Partial<T>, query: WhereOptions<T>): string =>
-      `UPDATE \`${name}\` SET ${parseOptions(data, Keys).replace(
-        / AND /g,
-        ', '
-      )} WHERE ${parseOptions(query, Keys)}`,
+      `UPDATE ${name} SET ${parseOptions(data, Keys).replace(/ AND /g, ', ')} WHERE ${parseOptions(
+        query,
+        Keys
+      )}`,
 
     upsert(data: T | T[]) {
       const insertKeys = getInsertKeys<Partial<T>>(data)
       const insertValues = getInsertValues<Partial<T>>(data, insertKeys)
       const sql: string[] = [
-        `INSERT INTO \`${name}\` (${insertKeys.map((k) => `\`${k}\``).join(', ')}) ${insertValues}`,
+        `INSERT INTO ${name} (${insertKeys.map((k) => `\`${k}\``).join(', ')}) ${insertValues}`,
       ]
 
       Array.isArray(data) && sql.push('AS MANY')

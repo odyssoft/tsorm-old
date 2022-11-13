@@ -25,7 +25,7 @@ export function aliasModel<T>(
     ): AliasModel<T & Alias<S, AA>> {
       this.keys.push(...model.keys)
       this.joins.push(
-        `${join} JOIN \`${model.name}\` AS ${model.alias} ON ${parseOptions(on, this.keys)}`
+        `${join} JOIN ${model.name} AS ${model.alias} ON ${parseOptions(on, this.keys)}`
       )
       return <AliasModel<T & Alias<S, AA>>>(<any>{
         ...this,
@@ -89,7 +89,7 @@ export function sql<T>(alias: string, name: string, keys: [], joins: []): SQLAli
   return {
     select(query?: SelectOptions<T>): string {
       const sql: string[] = [
-        `SELECT ${query?.$columns?.join(', ') ?? '*'} FROM \`${name}\` AS ${alias}`,
+        `SELECT ${query?.$columns?.join(', ') ?? '*'} FROM ${name} AS ${alias}`,
       ]
       joins.length && sql.push(joins.join(' '))
       query?.$where && sql.push(`WHERE ${parseOptions(query.$where, keys)}`)
