@@ -33,7 +33,7 @@ describe('model', () => {
       const user = await new User({ ...mockUser }).save()
 
       expect(mockQuery).toHaveBeenCalledWith(
-        "INSERT INTO `user` (`email`, `password`, `username`) VALUES ('test@test.com', 'password', 'testUser')"
+        "INSERT INTO `mock`.`user` (`email`, `password`, `username`) VALUES ('test@test.com', 'password', 'testUser')"
       )
 
       expect(user.userId).toBe(1)
@@ -44,7 +44,7 @@ describe('model', () => {
       const user = await new User({ ...mockUser }).save({ ignore: true })
 
       expect(mockQuery).toHaveBeenCalledWith(
-        "INSERT IGNORE INTO `user` (`email`, `password`, `username`) VALUES ('test@test.com', 'password', 'testUser')"
+        "INSERT IGNORE INTO `mock`.`user` (`email`, `password`, `username`) VALUES ('test@test.com', 'password', 'testUser')"
       )
 
       expect(user.userId).toBe(1)
@@ -63,14 +63,14 @@ describe('model', () => {
     it('should call query with correct params for single insert', async () => {
       await User.insert({ ...mockUser })
       expect(mockQuery).toHaveBeenCalledWith(
-        `INSERT INTO \`user\` (\`email\`, \`password\`, \`username\`) VALUES ('test@test.com', 'password', 'testUser')`
+        `INSERT INTO \`mock\`.\`user\` (\`email\`, \`password\`, \`username\`) VALUES ('test@test.com', 'password', 'testUser')`
       )
     })
 
     it('should call query with correct params with ignore', async () => {
       await User.insert({ ...mockUser }, { ignore: true })
       expect(mockQuery).toHaveBeenCalledWith(
-        `INSERT IGNORE INTO \`user\` (\`email\`, \`password\`, \`username\`) VALUES ('test@test.com', 'password', 'testUser')`
+        `INSERT IGNORE INTO \`mock\`.\`user\` (\`email\`, \`password\`, \`username\`) VALUES ('test@test.com', 'password', 'testUser')`
       )
     })
 
@@ -78,7 +78,7 @@ describe('model', () => {
       await User.insert([{ ...mockUser }, { ...mockUser2 }])
 
       expect(mockQuery).toHaveBeenCalledWith(
-        `INSERT INTO \`user\` (\`email\`, \`password\`, \`username\`) VALUES ('test@test.com', 'password', 'testUser'), ('test2@test.com', 'password2', 'testUser2')`
+        `INSERT INTO \`mock\`.\`user\` (\`email\`, \`password\`, \`username\`) VALUES ('test@test.com', 'password', 'testUser'), ('test2@test.com', 'password2', 'testUser2')`
       )
     })
   })
@@ -88,7 +88,7 @@ describe('model', () => {
       mockResponse = { insertId: 123 }
       const user = await User.create({ ...mockUser })
       expect(mockQuery).toHaveBeenCalledWith(
-        `INSERT INTO \`user\` (\`email\`, \`password\`, \`username\`) VALUES ('test@test.com', 'password', 'testUser')`
+        `INSERT INTO \`mock\`.\`user\` (\`email\`, \`password\`, \`username\`) VALUES ('test@test.com', 'password', 'testUser')`
       )
       expect(user).toEqual({
         ...mockUser,
@@ -102,7 +102,7 @@ describe('model', () => {
       mockResponse = { insertId: 123 }
       const users = await User.createMany([{ ...mockUser }, { ...mockUser2 }])
       expect(mockQuery).toHaveBeenCalledWith(
-        `INSERT INTO \`user\` (\`email\`, \`password\`, \`username\`) VALUES ('test@test.com', 'password', 'testUser'), ('test2@test.com', 'password2', 'testUser2')`
+        `INSERT INTO \`mock\`.\`user\` (\`email\`, \`password\`, \`username\`) VALUES ('test@test.com', 'password', 'testUser'), ('test2@test.com', 'password2', 'testUser2')`
       )
       expect(users).toEqual([
         {
@@ -121,7 +121,7 @@ describe('model', () => {
     it('should call query with correct params and return number of affected rows', async () => {
       mockResponse = { affectedRows: 4 }
       const result = await User.delete({ userId: { $greaterThanEqual: 1 } })
-      expect(mockQuery).toHaveBeenCalledWith(`DELETE FROM \`user\` WHERE userId >= 1`)
+      expect(mockQuery).toHaveBeenCalledWith(`DELETE FROM \`mock\`.\`user\` WHERE userId >= 1`)
       expect(result).toEqual([{ affectedRows: 4 }])
     })
   })
@@ -130,7 +130,7 @@ describe('model', () => {
     it('should call query with correct params and return number of affected rows', async () => {
       mockResponse = { affectedRows: 4 }
       const result = await User.deleteBy('userId', { $greaterThanEqual: 1 })
-      expect(mockQuery).toHaveBeenCalledWith(`DELETE FROM \`user\` WHERE userId >= 1`)
+      expect(mockQuery).toHaveBeenCalledWith(`DELETE FROM \`mock\`.\`user\` WHERE userId >= 1`)
       expect(result).toEqual(4)
     })
   })
@@ -139,14 +139,14 @@ describe('model', () => {
     it('should call query with correct params and return true when affected rows = 1', async () => {
       mockResponse = { affectedRows: 1 }
       const result = await User.deleteById(1)
-      expect(mockQuery).toHaveBeenCalledWith(`DELETE FROM \`user\` WHERE userId = 1`)
+      expect(mockQuery).toHaveBeenCalledWith(`DELETE FROM \`mock\`.\`user\` WHERE userId = 1`)
       expect(result).toBe(true)
     })
 
     it('should call query with correct params and return false when affected rows = 0', async () => {
       mockResponse = { affectedRows: 0 }
       const result = await User.deleteById(1)
-      expect(mockQuery).toHaveBeenCalledWith(`DELETE FROM \`user\` WHERE userId = 1`)
+      expect(mockQuery).toHaveBeenCalledWith(`DELETE FROM \`mock\`.\`user\` WHERE userId = 1`)
       expect(result).toBe(false)
     })
   })
@@ -155,14 +155,18 @@ describe('model', () => {
     it('should call query with correct params and return true when affected rows = 1', async () => {
       mockResponse = { affectedRows: 1 }
       const result = await User.deleteOne({ userId: { $greaterThanEqual: 1 } })
-      expect(mockQuery).toHaveBeenCalledWith(`DELETE FROM \`user\` WHERE userId >= 1 LIMIT 1`)
+      expect(mockQuery).toHaveBeenCalledWith(
+        `DELETE FROM \`mock\`.\`user\` WHERE userId >= 1 LIMIT 1`
+      )
       expect(result).toBe(true)
     })
 
     it('should call query with correct params and return false when affected rows = 0', async () => {
       mockResponse = { affectedRows: 0 }
       const result = await User.deleteOne({ userId: { $greaterThanEqual: 1 } })
-      expect(mockQuery).toHaveBeenCalledWith(`DELETE FROM \`user\` WHERE userId >= 1 LIMIT 1`)
+      expect(mockQuery).toHaveBeenCalledWith(
+        `DELETE FROM \`mock\`.\`user\` WHERE userId >= 1 LIMIT 1`
+      )
       expect(result).toBe(false)
     })
   })
@@ -171,14 +175,18 @@ describe('model', () => {
     it('should call query with correct params and return true when affected rows = 1', async () => {
       mockResponse = { affectedRows: 1 }
       const result = await User.deleteOneBy('userId', { $greaterThanEqual: 1 })
-      expect(mockQuery).toHaveBeenCalledWith(`DELETE FROM \`user\` WHERE userId >= 1 LIMIT 1`)
+      expect(mockQuery).toHaveBeenCalledWith(
+        `DELETE FROM \`mock\`.\`user\` WHERE userId >= 1 LIMIT 1`
+      )
       expect(result).toBe(true)
     })
 
     it('should call query with correct params and return false when affected rows = 0', async () => {
       mockResponse = { affectedRows: 0 }
       const result = await User.deleteOneBy('userId', { $greaterThanEqual: 1 })
-      expect(mockQuery).toHaveBeenCalledWith(`DELETE FROM \`user\` WHERE userId >= 1 LIMIT 1`)
+      expect(mockQuery).toHaveBeenCalledWith(
+        `DELETE FROM \`mock\`.\`user\` WHERE userId >= 1 LIMIT 1`
+      )
       expect(result).toBe(false)
     })
   })
@@ -187,7 +195,7 @@ describe('model', () => {
     it('should call query with correct params and return correct database entry', async () => {
       mockResponse = [mockUser]
       const users = await User.find({ userId: { $greaterThanEqual: 1 } })
-      expect(mockQuery).toHaveBeenCalledWith(`SELECT * FROM \`user\` WHERE userId >= 1`)
+      expect(mockQuery).toHaveBeenCalledWith(`SELECT * FROM \`mock\`.\`user\` WHERE userId >= 1`)
       expect(users).toEqual([mockUser])
     })
   })
@@ -196,7 +204,7 @@ describe('model', () => {
     it('should call query with correct params and return correct database entry', async () => {
       mockResponse = [mockUser]
       const user = await User.findBy('userId', { $greaterThanEqual: 1 })
-      expect(mockQuery).toHaveBeenCalledWith(`SELECT * FROM \`user\` WHERE userId >= 1`)
+      expect(mockQuery).toHaveBeenCalledWith(`SELECT * FROM \`mock\`.\`user\` WHERE userId >= 1`)
       expect(user).toEqual([mockUser])
     })
   })
@@ -205,14 +213,14 @@ describe('model', () => {
     it('should call query with correct params and return correct database entry', async () => {
       mockResponse = [mockUser]
       const user = await User.findById(1)
-      expect(mockQuery).toHaveBeenCalledWith(`SELECT * FROM \`user\` WHERE userId = 1`)
+      expect(mockQuery).toHaveBeenCalledWith(`SELECT * FROM \`mock\`.\`user\` WHERE userId = 1`)
       expect(user).toEqual(mockUser)
     })
 
     it('should call query with correct params and return null with no results', async () => {
       mockResponse = []
       const user = await User.findById(1)
-      expect(mockQuery).toHaveBeenCalledWith(`SELECT * FROM \`user\` WHERE userId = 1`)
+      expect(mockQuery).toHaveBeenCalledWith(`SELECT * FROM \`mock\`.\`user\` WHERE userId = 1`)
       expect(user).toBeNull()
     })
   })
@@ -221,14 +229,18 @@ describe('model', () => {
     it('should call query with correct params and return correct database entry', async () => {
       mockResponse = [mockUser]
       const user = await User.findOne({ userId: { $greaterThanEqual: 1 } })
-      expect(mockQuery).toHaveBeenCalledWith(`SELECT * FROM \`user\` WHERE userId >= 1 LIMIT 1`)
+      expect(mockQuery).toHaveBeenCalledWith(
+        `SELECT * FROM \`mock\`.\`user\` WHERE userId >= 1 LIMIT 1`
+      )
       expect(user).toEqual(mockUser)
     })
 
     it('should call query with correct params and return null with no results', async () => {
       mockResponse = []
       const user = await User.findOne({ userId: { $greaterThanEqual: 1 } })
-      expect(mockQuery).toHaveBeenCalledWith(`SELECT * FROM \`user\` WHERE userId >= 1 LIMIT 1`)
+      expect(mockQuery).toHaveBeenCalledWith(
+        `SELECT * FROM \`mock\`.\`user\` WHERE userId >= 1 LIMIT 1`
+      )
       expect(user).toBeNull()
     })
   })
@@ -237,14 +249,18 @@ describe('model', () => {
     it('should call query with correct params and return correct database entry', async () => {
       mockResponse = [mockUser]
       const user = await User.findOneBy('userId', { $greaterThanEqual: 1 })
-      expect(mockQuery).toHaveBeenCalledWith(`SELECT * FROM \`user\` WHERE userId >= 1 LIMIT 1`)
+      expect(mockQuery).toHaveBeenCalledWith(
+        `SELECT * FROM \`mock\`.\`user\` WHERE userId >= 1 LIMIT 1`
+      )
       expect(user).toEqual(mockUser)
     })
 
     it('should call query with correct params and return null with no results', async () => {
       mockResponse = []
       const user = await User.findOneBy('userId', { $greaterThanEqual: 1 })
-      expect(mockQuery).toHaveBeenCalledWith(`SELECT * FROM \`user\` WHERE userId >= 1 LIMIT 1`)
+      expect(mockQuery).toHaveBeenCalledWith(
+        `SELECT * FROM \`mock\`.\`user\` WHERE userId >= 1 LIMIT 1`
+      )
       expect(user).toBeNull()
     })
   })
@@ -254,7 +270,7 @@ describe('model', () => {
       mockResponse = { insertId: 157 }
       const post = await Post.insertIgnore({ post: 'test', userId: 123 })
       expect(mockQuery).toHaveBeenCalledWith(
-        `INSERT IGNORE INTO \`post\` (\`post\`, \`userId\`) VALUES ('test', 123)`
+        `INSERT IGNORE INTO \`mock\`.\`post\` (\`post\`, \`userId\`) VALUES ('test', 123)`
       )
       expect(post).toEqual({ post: 'test', userId: 123, postId: 157 })
     })
@@ -266,7 +282,7 @@ describe('model', () => {
         { post: 'test 2', userId: 456 },
       ])
       expect(mockQuery).toHaveBeenCalledWith(
-        `INSERT IGNORE INTO \`post\` (\`post\`, \`userId\`) VALUES ('test 1', 123), ('test 2', 456)`
+        `INSERT IGNORE INTO \`mock\`.\`post\` (\`post\`, \`userId\`) VALUES ('test 1', 123), ('test 2', 456)`
       )
       expect(post).toEqual([
         { post: 'test 1', userId: 123, postId: 158 },
@@ -283,7 +299,7 @@ describe('model', () => {
         $where: { userId: { $greaterThanEqual: 1 } },
       })
       expect(mockQuery).toHaveBeenCalledWith(
-        `SELECT userId, username FROM \`user\` WHERE userId >= 1`
+        `SELECT userId, username FROM \`mock\`.\`user\` WHERE userId >= 1`
       )
       expect(users).toEqual([[{ userId: 1, username: 'test' }]])
     })
@@ -293,14 +309,14 @@ describe('model', () => {
       const users = await User.select({
         $where: { userId: { $greaterThanEqual: 1 } },
       })
-      expect(mockQuery).toHaveBeenCalledWith(`SELECT * FROM \`user\` WHERE userId >= 1`)
+      expect(mockQuery).toHaveBeenCalledWith(`SELECT * FROM \`mock\`.\`user\` WHERE userId >= 1`)
       expect(users).toEqual([[{ ...mockUser, userId: 1 }]])
     })
 
     it('should call query with correct params and return results without $with', async () => {
       mockResponse = [{ ...mockUser, userId: 1 }]
       const users = await User.select()
-      expect(mockQuery).toHaveBeenCalledWith(`SELECT * FROM \`user\``)
+      expect(mockQuery).toHaveBeenCalledWith(`SELECT * FROM \`mock\`.\`user\``)
       expect(users).toEqual([[{ ...mockUser, userId: 1 }]])
     })
 
@@ -310,7 +326,7 @@ describe('model', () => {
         $groupBy: 'userId',
       })
       expect(mockQuery).toHaveBeenCalledWith(
-        `SELECT * FROM \`user\` WHERE userId >= 1 GROUP BY userId`
+        `SELECT * FROM \`mock\`.\`user\` WHERE userId >= 1 GROUP BY userId`
       )
     })
 
@@ -320,7 +336,7 @@ describe('model', () => {
         $groupBy: ['userId', 'email'],
       })
       expect(mockQuery).toHaveBeenCalledWith(
-        `SELECT * FROM \`user\` WHERE userId >= 1 GROUP BY userId, email`
+        `SELECT * FROM \`mock\`.\`user\` WHERE userId >= 1 GROUP BY userId, email`
       )
     })
 
@@ -330,7 +346,7 @@ describe('model', () => {
         $orderBy: 'userId',
       })
       expect(mockQuery).toHaveBeenCalledWith(
-        `SELECT * FROM \`user\` WHERE userId >= 1 ORDER BY userId`
+        `SELECT * FROM \`mock\`.\`user\` WHERE userId >= 1 ORDER BY userId`
       )
     })
 
@@ -340,7 +356,7 @@ describe('model', () => {
         $orderBy: ['userId ASC', 'email DESC'],
       })
       expect(mockQuery).toHaveBeenCalledWith(
-        `SELECT * FROM \`user\` WHERE userId >= 1 ORDER BY userId ASC, email DESC`
+        `SELECT * FROM \`mock\`.\`user\` WHERE userId >= 1 ORDER BY userId ASC, email DESC`
       )
     })
 
@@ -349,7 +365,9 @@ describe('model', () => {
         $where: { userId: { $greaterThanEqual: 1 } },
         $limit: 10,
       })
-      expect(mockQuery).toHaveBeenCalledWith(`SELECT * FROM \`user\` WHERE userId >= 1 LIMIT 10`)
+      expect(mockQuery).toHaveBeenCalledWith(
+        `SELECT * FROM \`mock\`.\`user\` WHERE userId >= 1 LIMIT 10`
+      )
     })
 
     it('should call query with correct query using limit and skip', () => {
@@ -357,7 +375,9 @@ describe('model', () => {
         $where: { userId: { $greaterThanEqual: 1 } },
         $limit: [1, 2],
       })
-      expect(mockQuery).toHaveBeenCalledWith(`SELECT * FROM \`user\` WHERE userId >= 1 LIMIT 1, 2`)
+      expect(mockQuery).toHaveBeenCalledWith(
+        `SELECT * FROM \`mock\`.\`user\` WHERE userId >= 1 LIMIT 1, 2`
+      )
     })
   })
 
@@ -365,7 +385,7 @@ describe('model', () => {
     it('should call query with correct params and return results', async () => {
       mockResponse = { affectedRows: 1 }
       const result = await User.truncate()
-      expect(mockQuery).toHaveBeenCalledWith(`TRUNCATE TABLE \`user\``)
+      expect(mockQuery).toHaveBeenCalledWith(`TRUNCATE TABLE \`mock\`.\`user\``)
       expect(result).toEqual([{ affectedRows: 1 }])
     })
   })
@@ -378,7 +398,7 @@ describe('model', () => {
         { userId: { $greaterThanEqual: 1 } }
       )
       expect(mockQuery).toHaveBeenCalledWith(
-        `UPDATE \`user\` SET username = 'testUser' WHERE userId >= 1`
+        `UPDATE \`mock\`.\`user\` SET username = 'testUser' WHERE userId >= 1`
       )
       expect(result).toEqual([{ affectedRows: 1 }])
     })
@@ -390,7 +410,7 @@ describe('model', () => {
         { userId: { $greaterThanEqual: 1 } }
       )
       expect(mockQuery).toHaveBeenCalledWith(
-        `UPDATE \`user\` SET username = 'testUser' WHERE userId >= 1`
+        `UPDATE \`mock\`.\`user\` SET username = 'testUser' WHERE userId >= 1`
       )
       expect(result).toEqual([{ affectedRows: 0 }])
     })
@@ -401,7 +421,7 @@ describe('model', () => {
       mockResponse = { affectedRows: 1 }
       const result = await User.upsert({ ...mockUser, userId: 1 })
       expect(mockQuery).toHaveBeenCalledWith(
-        `INSERT INTO \`user\` (\`email\`, \`password\`, \`username\`, \`userId\`) VALUES ('test@test.com', 'password', 'testUser', 1) ON DUPLICATE KEY UPDATE \`email\` = 'test@test.com', \`password\` = 'password', \`username\` = 'testUser'`
+        `INSERT INTO \`mock\`.\`user\` (\`email\`, \`password\`, \`username\`, \`userId\`) VALUES ('test@test.com', 'password', 'testUser', 1) ON DUPLICATE KEY UPDATE \`email\` = 'test@test.com', \`password\` = 'password', \`username\` = 'testUser'`
       )
       expect(result).toEqual([{ affectedRows: 1 }])
     })
@@ -412,7 +432,7 @@ describe('model', () => {
       mockResponse = { affectedRows: 1 }
       const result = await User.upsertOne({ ...mockUser, userId: 1 })
       expect(mockQuery).toHaveBeenCalledWith(
-        `INSERT INTO \`user\` (\`email\`, \`password\`, \`username\`, \`userId\`) VALUES ('test@test.com', 'password', 'testUser', 1) ON DUPLICATE KEY UPDATE \`email\` = 'test@test.com', \`password\` = 'password', \`username\` = 'testUser'`
+        `INSERT INTO \`mock\`.\`user\` (\`email\`, \`password\`, \`username\`, \`userId\`) VALUES ('test@test.com', 'password', 'testUser', 1) ON DUPLICATE KEY UPDATE \`email\` = 'test@test.com', \`password\` = 'password', \`username\` = 'testUser'`
       )
       expect(result).toBe(true)
     })
@@ -426,7 +446,7 @@ describe('model', () => {
         { ...mockUser2, userId: 2 },
       ])
       expect(mockQuery).toHaveBeenCalledWith(
-        `INSERT INTO \`user\` (\`email\`, \`password\`, \`username\`, \`userId\`) VALUES ('test@test.com', 'password', 'testUser', 1), ('test2@test.com', 'password2', 'testUser2', 2) AS MANY ON DUPLICATE KEY UPDATE \`email\` = MANY.email, \`password\` = MANY.password, \`username\` = MANY.username`
+        `INSERT INTO \`mock\`.\`user\` (\`email\`, \`password\`, \`username\`, \`userId\`) VALUES ('test@test.com', 'password', 'testUser', 1), ('test2@test.com', 'password2', 'testUser2', 2) AS MANY ON DUPLICATE KEY UPDATE \`email\` = MANY.email, \`password\` = MANY.password, \`username\` = MANY.username`
       )
       expect(result).toBe(true)
     })

@@ -23,7 +23,7 @@ describe('aliasModel', () => {
       })
 
       expect(join.alias).toBe('u')
-      expect(join.joins).toEqual(['INNER JOIN `post` AS p ON u.userId = p.userId'])
+      expect(join.joins).toEqual(['INNER JOIN `mock`.`post` AS p ON u.userId = p.userId'])
       expect(join.keys).toEqual([
         'u.userId',
         'u.username',
@@ -44,7 +44,7 @@ describe('aliasModel', () => {
         })
         .select()
       expect(mockQuery).toHaveBeenCalledWith(
-        `SELECT * FROM \`user\` AS u INNER JOIN \`post\` AS p ON u.userId = p.userId`
+        `SELECT * FROM \`mock\`.\`user\` AS u INNER JOIN \`mock\`.\`post\` AS p ON u.userId = p.userId`
       )
     })
 
@@ -57,7 +57,7 @@ describe('aliasModel', () => {
           $columns: ['u.userId', 'u.username', 'u.email', 'p.postId', 'p.userId', 'p.post'],
         })
       expect(mockQuery).toHaveBeenCalledWith(
-        `SELECT u.userId, u.username, u.email, p.postId, p.userId, p.post FROM \`user\` AS u INNER JOIN \`post\` AS p ON u.userId = p.userId`
+        `SELECT u.userId, u.username, u.email, p.postId, p.userId, p.post FROM \`mock\`.\`user\` AS u INNER JOIN \`mock\`.\`post\` AS p ON u.userId = p.userId`
       )
     })
 
@@ -78,7 +78,7 @@ describe('aliasModel', () => {
           },
         })
       expect(mockQuery).toHaveBeenCalledWith(
-        `SELECT * FROM \`user\` AS u INNER JOIN \`post\` AS p ON u.userId = p.userId WHERE u.userId = 1 AND p.postId BETWEEN 1 AND 10`
+        `SELECT * FROM \`mock\`.\`user\` AS u INNER JOIN \`mock\`.\`post\` AS p ON u.userId = p.userId WHERE u.userId = 1 AND p.postId BETWEEN 1 AND 10`
       )
     })
 
@@ -100,7 +100,7 @@ describe('aliasModel', () => {
           },
         })
       expect(mockQuery).toHaveBeenCalledWith(
-        `SELECT u.userId, u.username, u.email, p.postId, p.userId, p.post FROM \`user\` AS u INNER JOIN \`post\` AS p ON u.userId = p.userId WHERE u.userId = 1 AND p.postId BETWEEN 1 AND 10`
+        `SELECT u.userId, u.username, u.email, p.postId, p.userId, p.post FROM \`mock\`.\`user\` AS u INNER JOIN \`mock\`.\`post\` AS p ON u.userId = p.userId WHERE u.userId = 1 AND p.postId BETWEEN 1 AND 10`
       )
     })
 
@@ -113,7 +113,7 @@ describe('aliasModel', () => {
           $groupBy: 'u.userId',
         })
       expect(mockQuery).toHaveBeenCalledWith(
-        `SELECT * FROM \`user\` AS u INNER JOIN \`post\` AS p ON u.userId = p.userId GROUP BY u.userId`
+        `SELECT * FROM \`mock\`.\`user\` AS u INNER JOIN \`mock\`.\`post\` AS p ON u.userId = p.userId GROUP BY u.userId`
       )
     })
 
@@ -126,7 +126,7 @@ describe('aliasModel', () => {
           $groupBy: ['u.userId', 'p.postId'],
         })
       expect(mockQuery).toHaveBeenCalledWith(
-        `SELECT * FROM \`user\` AS u INNER JOIN \`post\` AS p ON u.userId = p.userId GROUP BY u.userId, p.postId`
+        `SELECT * FROM \`mock\`.\`user\` AS u INNER JOIN \`mock\`.\`post\` AS p ON u.userId = p.userId GROUP BY u.userId, p.postId`
       )
     })
 
@@ -139,7 +139,7 @@ describe('aliasModel', () => {
           $orderBy: ['u.userId', 'p.postId DESC'],
         })
       expect(mockQuery).toHaveBeenCalledWith(
-        `SELECT * FROM \`user\` AS u INNER JOIN \`post\` AS p ON u.userId = p.userId ORDER BY u.userId, p.postId DESC`
+        `SELECT * FROM \`mock\`.\`user\` AS u INNER JOIN \`mock\`.\`post\` AS p ON u.userId = p.userId ORDER BY u.userId, p.postId DESC`
       )
     })
 
@@ -152,7 +152,7 @@ describe('aliasModel', () => {
           $orderBy: 'p.postId ASC',
         })
       expect(mockQuery).toHaveBeenCalledWith(
-        `SELECT * FROM \`user\` AS u INNER JOIN \`post\` AS p ON u.userId = p.userId ORDER BY p.postId ASC`
+        `SELECT * FROM \`mock\`.\`user\` AS u INNER JOIN \`mock\`.\`post\` AS p ON u.userId = p.userId ORDER BY p.postId ASC`
       )
     })
 
@@ -165,7 +165,7 @@ describe('aliasModel', () => {
           $limit: 10,
         })
       expect(mockQuery).toHaveBeenCalledWith(
-        `SELECT * FROM \`user\` AS u INNER JOIN \`post\` AS p ON u.userId = p.userId LIMIT 10`
+        `SELECT * FROM \`mock\`.\`user\` AS u INNER JOIN \`mock\`.\`post\` AS p ON u.userId = p.userId LIMIT 10`
       )
     })
 
@@ -178,7 +178,7 @@ describe('aliasModel', () => {
           $limit: [1, 2],
         })
       expect(mockQuery).toHaveBeenCalledWith(
-        `SELECT * FROM \`user\` AS u INNER JOIN \`post\` AS p ON u.userId = p.userId LIMIT 1, 2`
+        `SELECT * FROM \`mock\`.\`user\` AS u INNER JOIN \`mock\`.\`post\` AS p ON u.userId = p.userId LIMIT 1, 2`
       )
     })
 
@@ -203,7 +203,7 @@ describe('aliasModel', () => {
           $limit: 10,
         })
       expect(mockQuery).toHaveBeenCalledWith(
-        `SELECT u.userId, u.username, u.email, p.postId, p.userId, p.post FROM \`user\` AS u INNER JOIN \`post\` AS p ON u.userId = p.userId WHERE u.userId = 1 AND p.postId BETWEEN 1 AND 10 GROUP BY u.userId, p.postId ORDER BY u.userId, p.postId LIMIT 10`
+        `SELECT u.userId, u.username, u.email, p.postId, p.userId, p.post FROM \`mock\`.\`user\` AS u INNER JOIN \`mock\`.\`post\` AS p ON u.userId = p.userId WHERE u.userId = 1 AND p.postId BETWEEN 1 AND 10 GROUP BY u.userId, p.postId ORDER BY u.userId, p.postId LIMIT 10`
       )
     })
 
@@ -212,7 +212,7 @@ describe('aliasModel', () => {
         const crossJoin = User.as('u').crossJoin(Post.as('p'), { 'u.userId': 'p.userId' })
 
         expect(crossJoin.alias).toBe('u')
-        expect(crossJoin.joins).toEqual(['CROSS JOIN `post` AS p ON u.userId = p.userId'])
+        expect(crossJoin.joins).toEqual(['CROSS JOIN `mock`.`post` AS p ON u.userId = p.userId'])
         expect(crossJoin.keys).toEqual([
           'u.userId',
           'u.username',
@@ -230,7 +230,7 @@ describe('aliasModel', () => {
         const innerJoin = User.as('u').innerJoin(Post.as('p'), { 'u.userId': 'p.userId' })
 
         expect(innerJoin.alias).toBe('u')
-        expect(innerJoin.joins).toEqual(['INNER JOIN `post` AS p ON u.userId = p.userId'])
+        expect(innerJoin.joins).toEqual(['INNER JOIN `mock`.`post` AS p ON u.userId = p.userId'])
         expect(innerJoin.keys).toEqual([
           'u.userId',
           'u.username',
@@ -248,7 +248,7 @@ describe('aliasModel', () => {
         const leftJoin = User.as('u').leftJoin(Post.as('p'), { 'u.userId': 'p.userId' })
 
         expect(leftJoin.alias).toBe('u')
-        expect(leftJoin.joins).toEqual(['LEFT JOIN `post` AS p ON u.userId = p.userId'])
+        expect(leftJoin.joins).toEqual(['LEFT JOIN `mock`.`post` AS p ON u.userId = p.userId'])
         expect(leftJoin.keys).toEqual([
           'u.userId',
           'u.username',
@@ -266,7 +266,9 @@ describe('aliasModel', () => {
         const leftOuterJoin = User.as('u').leftOuterJoin(Post.as('p'), { 'u.userId': 'p.userId' })
 
         expect(leftOuterJoin.alias).toBe('u')
-        expect(leftOuterJoin.joins).toEqual(['LEFT OUTER JOIN `post` AS p ON u.userId = p.userId'])
+        expect(leftOuterJoin.joins).toEqual([
+          'LEFT OUTER JOIN `mock`.`post` AS p ON u.userId = p.userId',
+        ])
         expect(leftOuterJoin.keys).toEqual([
           'u.userId',
           'u.username',
@@ -284,7 +286,7 @@ describe('aliasModel', () => {
         const rightJoin = User.as('u').rightJoin(Post.as('p'), { 'u.userId': 'p.userId' })
 
         expect(rightJoin.alias).toBe('u')
-        expect(rightJoin.joins).toEqual(['RIGHT JOIN `post` AS p ON u.userId = p.userId'])
+        expect(rightJoin.joins).toEqual(['RIGHT JOIN `mock`.`post` AS p ON u.userId = p.userId'])
         expect(rightJoin.keys).toEqual([
           'u.userId',
           'u.username',
@@ -303,7 +305,7 @@ describe('aliasModel', () => {
 
         expect(rightOuterJoin.alias).toBe('u')
         expect(rightOuterJoin.joins).toEqual([
-          'RIGHT OUTER JOIN `post` AS p ON u.userId = p.userId',
+          'RIGHT OUTER JOIN `mock`.`post` AS p ON u.userId = p.userId',
         ])
         expect(rightOuterJoin.keys).toEqual([
           'u.userId',
