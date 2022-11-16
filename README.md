@@ -25,6 +25,7 @@ export const mySchema = new Schema('my_schema', {
   password: 'password',
   port: 3306,
   user: 'root',
+  create: true, //  optional for when you want to create the schema and tables. (creating schemas and tables every server (re)start is not necessary)
 })
 ```
 

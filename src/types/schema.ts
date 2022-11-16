@@ -7,6 +7,7 @@ export interface ConnectionOptions extends PoolOptions {
   password: string
   port: number
   user: string
+  create?: boolean
 }
 
 export type ModelsKeys<T> = {
