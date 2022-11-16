@@ -8,19 +8,26 @@ export class Schema {
   public name: string
   public connection: Pool
   private queries: string[] = []
-  constructor(name: string, connection: ConnectionOptions) {
+  constructor(name: string, { create, ...connection }: ConnectionOptions) {
     this.name = name
     this.connection = createPool({
       ...connection,
       multipleStatements: true,
     })
-    this.connection
-      .query(`CREATE DATABASE IF NOT EXISTS \`${name}\`; USE \`${name}\`;`)
-      .then(() => this.connection.query(this.queries.join(';')))
-      .catch((error: any) => {
-        this.connection.end()
-        console.error({ error })
-      })
+
+    if (create) {
+      this.connection
+        .query(`CREATE DATABASE IF NOT EXISTS \`${name}\`; USE \`${name}\`;`)
+        .then(() => {
+          if (this.queries.length) {
+            this.connection.query(this.queries.join(';'))
+          }
+        })
+        .catch((error: any) => {
+          this.connection.end()
+          console.error({ error })
+        })
+    }
   }
 
   createModel<T>(name: string, keys: ModelKeys<T>) {
