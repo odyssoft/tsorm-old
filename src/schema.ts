@@ -41,6 +41,11 @@ export class Schema {
     return createModel<T>(name, keys, this.connection, this.name)
   }
 
+  createView<T>(name: string, keys: ModelKeys<T>, query: string) {
+    this.queries.push(`CREATE OR REPLACE VIEW \`${name}\` AS ${query}`)
+    return createView<T>(name, keys, this.connection, this.name)
+  }
+
   query = <T extends RowDataPacket[] | RowDataPacket[][] | OkPacket | OkPacket[]>(sql: string) =>
     this.connection.query<T>(sql)
 
