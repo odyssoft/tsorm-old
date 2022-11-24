@@ -1,8 +1,9 @@
 import { createPool, OkPacket, Pool, RowDataPacket } from 'mysql2/promise'
 
 import { createModel } from './model'
-import { mapKey } from './utils'
 import { ConnectionOptions, ModelKeys } from './types'
+import { mapKey } from './utils'
+import { createView } from './view'
 
 export class Schema {
   public name: string
@@ -39,6 +40,11 @@ export class Schema {
       )}${primaries.length ? `, PRIMARY KEY (${primaries.join(', ')})` : ''})`
     )
     return createModel<T>(name, keys, this.connection, this.name)
+  }
+
+  createView<T>(name: string, keys: string[], query: string) {
+    this.queries.push(`CREATE OR REPLACE VIEW \`${name}\` AS ${query}`)
+    return createView<T>(name, keys, this.connection, this.name)
   }
 
   query = <T extends RowDataPacket[] | RowDataPacket[][] | OkPacket | OkPacket[]>(sql: string) =>
