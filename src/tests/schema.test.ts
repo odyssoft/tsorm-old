@@ -107,6 +107,25 @@ describe('Schema', () => {
     })
   })
 
+  describe('createView', () => {
+    it('should create view with correct query', (done) => {
+      jest.clearAllMocks()
+      mockPromise = Promise.resolve([])
+      const testSchema = new Schema('test', { ...mockOptions, create: true })
+      testSchema.createView(
+        'mockView',
+        ['mockId', 'mockName', 'mockEmail'],
+        'SELECT * FROM mockUser'
+      )
+      setTimeout(() => {
+        expect(mockQuery).toHaveBeenCalledWith(
+          'CREATE OR REPLACE VIEW `mockView` AS SELECT * FROM mockUser'
+        )
+        done()
+      }, 100)
+    })
+  })
+
   describe('query', () => {
     it('should call query with passed sql', () => {
       const testSchema = new Schema('test', mockOptions)

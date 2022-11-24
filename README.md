@@ -92,6 +92,32 @@ const UserRoutes = () => {
 export default UserRoutes
 ```
 
+## Views
+
+### Database/views/userpost.ts
+
+```typescript
+import { DataTypes } from '@odyssoft/tsorm'
+
+import { User, Post } from '../models'
+import mySchema from '../schema'
+
+export interface IUserPost {
+  userId: number
+  username: string
+  postId: number
+  title: string
+}
+
+export const UserPost = mockSchema.createView<IUserPost>(
+  'userpost',
+  ['userId', 'username', 'postId', 'title'],
+  User.as('U')
+    .join(Post.as('P'), 'U.userId', 'P.userId')
+    .select('U.userId', 'U.username', 'P.postId', 'P.title')
+)
+```
+
 ### Query examples
 
 ```typescript
