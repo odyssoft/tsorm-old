@@ -1,6 +1,6 @@
-import { aliasModel } from 'aliasModel'
 import { FieldPacket, Pool, RowDataPacket } from 'mysql2/promise'
 
+import { aliasModel } from './aliasModel'
 import { Alias, AliasModel, ModelKeys, SelectOptions, SQLViewType, ViewType } from './types'
 import { parseOptions } from './utils'
 
