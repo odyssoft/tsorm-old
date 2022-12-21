@@ -1,9 +1,9 @@
 import { FieldPacket, RowDataPacket } from 'mysql2'
 
 import { Alias, AliasModel } from './aliasModel'
-import { SelectOptions } from './query'
+import { SelectOptions } from './model'
 
-export type ViewType<T, N extends string = any> = {
+export type ViewType<T> = {
   select: (query?: SelectOptions<T>) => Promise<[RowDataPacket[], FieldPacket[]]>
 
   SQL: () => SQLViewType<T>

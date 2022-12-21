@@ -9,7 +9,6 @@ export class Schema {
   public name: string
   public connection: Pool
   private queries: string[] = []
-
   constructor(name: string, { create, ...connection }: ConnectionOptions) {
     this.name = name
     this.connection = createPool({
@@ -32,7 +31,7 @@ export class Schema {
     }
   }
 
-  createModel<T, N>(name: N, keys: ModelKeys<T>) {
+  createModel<T>(name: string, keys: ModelKeys<T>) {
     const Keys = Object.keys(keys)
     const primaries = Keys.filter((k) => keys[k].primaryKey).map((k) => `\`${k}\``)
     this.queries.push(
@@ -40,7 +39,7 @@ export class Schema {
         ', '
       )}${primaries.length ? `, PRIMARY KEY (${primaries.join(', ')})` : ''})`
     )
-    return createModel<T, N>(name, keys, this.connection, this.name)
+    return createModel<T>(name, keys, this.connection, this.name)
   }
 
   createView<T>(name: string, keys: string[], query: string) {

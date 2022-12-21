@@ -33,7 +33,7 @@ export type DataType =
   | `VARBINARY(${string})`
   | `VARCHAR(${string})`
 
-export interface IDataTypes {
+export interface DataTypesType {
   bigInt: DataType
   binary: (size: number) => DataType
   bit: (size: number) => DataType
